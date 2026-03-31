@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniJadval Pro — Korporativ Universitet Tizimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07090f;
+  --s1:#0d1018;
+  --s2:#111520;
+  --s3:#171d2c;
+  --bdr:#1c2235;
+  --bdr2:#252d42;
+  --a1:#5b8dee;   /* blue  */
+  --a2:#f0a84a;   /* gold  */
+  --a3:#3dd68c;   /* green */
+  --a4:#e85d7a;   /* red   */
+  --a5:#b06ef3;   /* purple*/
+  --a6:#3dc8d6;   /* cyan  */
+  --tx:#dde2f0;
+  --tx2:#7b86a0;
+  --tx3:#3a4260;
+  --fn:'DM Sans',sans-serif;
+  --fd:'Syne',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --radius:10px;
+  --sh: 0 4px 24px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--tx);font-family:var(--fn);min-height:100vh;overflow-x:hidden;}
+
+/* grid bg */
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(91,141,238,0.04) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% 90%,rgba(61,214,140,0.03) 0%,transparent 60%),
+             linear-gradient(var(--bdr) 1px,transparent 1px) 0 0/44px 44px,
+             linear-gradient(90deg,var(--bdr) 1px,transparent 1px) 0 0/44px 44px;
+  opacity:.35;pointer-events:none;z-index:0;}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bdr);z-index:200;display:flex;flex-direction:column;overflow-y:auto;}
+.sidebar-logo{padding:1.2rem 1.25rem 1rem;border-bottom:1px solid var(--bdr);}
+.logo-mark{font-family:var(--fd);font-size:1.3rem;color:var(--a1);letter-spacing:-1px;}
+.logo-mark span{color:var(--a2);}
+.logo-sub{font-size:.65rem;color:var(--tx3);font-family:var(--fm);margin-top:.1rem;}
+
+.uni-selector{margin:.75rem .75rem .5rem;background:var(--s2);border:1px solid var(--bdr);border-radius:var(--radius);padding:.5rem .7rem;width:calc(100% - 1.5rem);}
+.uni-selector select{background:transparent;border:none;color:var(--tx);font-family:var(--fn);font-size:.8rem;width:100%;outline:none;cursor:pointer;}
+
+.sidebar-section{padding:.5rem .75rem .25rem;font-family:var(--fm);font-size:.6rem;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;}
+.nav-item{display:flex;align-items:center;gap:.6rem;padding:.55rem 1rem;margin:.1rem .5rem;border-radius:8px;border:none;background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--fn);font-size:.83rem;width:calc(100% - 1rem);text-align:left;transition:all .18s;}
+.nav-item:hover{background:var(--s2);color:var(--tx);}
+.nav-item.active{background:rgba(91,141,238,.12);color:var(--a1);border:1px solid rgba(91,141,238,.2);}
+.nav-item .icon{width:18px;text-align:center;font-size:.9rem;}
+.nav-badge{margin-left:auto;background:var(--a4);color:#fff;font-size:.6rem;font-family:var(--fm);border-radius:20px;padding:.1rem .4rem;min-width:18px;text-align:center;}
+
+.sidebar-footer{margin-top:auto;padding:.75rem 1rem;border-top:1px solid var(--bdr);}
+.sem-info{background:rgba(91,141,238,.08);border:1px solid rgba(91,141,238,.2);border-radius:8px;padding:.6rem .8rem;}
+.sem-label{font-size:.6rem;font-family:var(--fm);color:var(--tx3);}
+.sem-val{font-size:.8rem;color:var(--a1);margin-top:.1rem;}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;left:220px;right:0;top:0;height:54px;background:rgba(7,9,15,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--bdr);z-index:100;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;}
+.topbar-title{font-family:var(--fd);font-size:1.05rem;color:var(--tx);flex:1;}
+.topbar-chips{display:flex;gap:.5rem;}
+.chip{font-family:var(--fm);font-size:.65rem;padding:.25rem .7rem;border-radius:20px;border:1px solid var(--bdr2);color:var(--tx2);}
+.chip.ok{border-color:rgba(61,214,140,.3);color:var(--a3);}
+.chip.warn{border-color:rgba(232,93,122,.3);color:var(--a4);}
+
+/* ── MAIN ── */
+.main{margin-left:220px;padding-top:54px;min-height:100vh;position:relative;z-index:1;}
+.page{display:none;padding:1.5rem;}
+.page.active{display:block;}
+
+/* ── SECTION TITLES ── */
+.sec-title{font-family:var(--fd);font-size:1.2rem;color:var(--tx);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--bdr);}
+.sec-title .cnt{font-family:var(--fm);font-size:.7rem;color:var(--tx3);font-weight:normal;}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);padding:1.1rem 1.25rem;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--bdr2);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sc-c1::before{background:var(--a1);}
+.sc-c2::before{background:var(--a2);}
+.sc-c3::before{background:var(--a3);}
+.sc-c4::before{background:var(--a4);}
+.sc-c5::before{background:var(--a5);}
+.stat-label{font-family:var(--fm);font-size:.6rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem;}
+.stat-val{font-family:var(--fd);font-size:2rem;font-weight:800;line-height:1;}
+.stat-val.c1{color:var(--a1);}
+.stat-val.c2{color:var(--a2);}
+.stat-val.c3{color:var(--a3);}
+.stat-val.c4{color:var(--a4);}
+.stat-val.c5{color:var(--a5);}
+.stat-sub{font-size:.68rem;color:var(--tx3);margin-top:.3rem;}
+
+/* ── PANELS / CARDS ── */
+.panel{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+.panel-title{font-family:var(--fd);font-size:.95rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:.5rem;}
+
+/* ── FORM ── */
+.fg{display:flex;flex-direction:column;gap:.35rem;}
+.fg label{font-family:var(--fm);font-size:.62rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;}
+.fg input,.fg select,.fg textarea{background:var(--s2);border:1px solid var(--bdr);border-radius:8px;color:var(--tx);padding:.55rem .8rem;font-family:var(--fn);font-size:.83rem;outline:none;transition:border-color .18s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--a1);}
+.fg select option{background:var(--s2);}
+.fg textarea{resize:vertical;min-height:60px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.85rem;}
+
+/* ── BUTTONS ── */
+.btn{padding:.5rem 1.1rem;border-radius:8px;border:none;cursor:pointer;font-family:var(--fn);font-size:.83rem;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;gap:.35rem;}
+.btn-p{background:var(--a1);color:#fff;}.btn-p:hover{background:#4a7ddd;}
+.btn-g{background:rgba(61,214,140,.12);color:var(--a3);border:1px solid rgba(61,214,140,.25);}
+.btn-g:hover{background:rgba(61,214,140,.2);}
+.btn-o{background:rgba(240,168,74,.12);color:var(--a2);border:1px solid rgba(240,168,74,.25);}
+.btn-r{background:rgba(232,93,122,.1);color:var(--a4);border:1px solid rgba(232,93,122,.25);}
+.btn-r:hover{background:rgba(232,93,122,.18);}
+.btn-s{background:var(--s2);color:var(--tx2);border:1px solid var(--bdr);}
+.btn-s:hover{border-color:var(--a1);color:var(--a1);}
+.btn-sm{padding:.3rem .7rem;font-size:.72rem;}
+.btn-row{display:flex;gap:.6rem;margin-top:1rem;align-items:center;flex-wrap:wrap;}
+
+/* ── DATA TABLE ── */
+.tbl-wrap{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);overflow:auto;}
+.dtbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.dtbl th{padding:.65rem 1rem;text-align:left;background:var(--s2);font-family:var(--fm);font-size:.62rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bdr);white-space:nowrap;}
+.dtbl td{padding:.65rem 1rem;border-bottom:1px solid var(--bdr);color:var(--tx);vertical-align:middle;}
+.dtbl tr:last-child td{border-bottom:none;}
+.dtbl tr:hover td{background:rgba(255,255,255,.018);}
+.dtbl .acts{display:flex;gap:.35rem;}
+.abtn{padding:.25rem .6rem;border-radius:5px;border:1px solid var(--bdr);background:transparent;color:var(--tx3);cursor:pointer;font-size:.7rem;font-family:var(--fm);transition:all .15s;}
+.abtn:hover{color:var(--a1);border-color:var(--a1);}
+.abtn.del:hover{color:var(--a4);border-color:var(--a4);}
+.abtn.edit:hover{color:var(--a2);border-color:var(--a2);}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;padding:.15rem .55rem;border-radius:20px;font-family:var(--fm);font-size:.65rem;border:1px solid;}
+.tag-b{background:rgba(91,141,238,.1);color:var(--a1);border-color:rgba(91,141,238,.25);}
+.tag-g{background:rgba(61,214,140,.1);color:var(--a3);border-color:rgba(61,214,140,.25);}
+.tag-o{background:rgba(240,168,74,.1);color:var(--a2);border-color:rgba(240,168,74,.25);}
+.tag-r{background:rgba(232,93,122,.1);color:var(--a4);border-color:rgba(232,93,122,.25);}
+.tag-p{background:rgba(176,110,243,.1);color:var(--a5);border-color:rgba(176,110,243,.25);}
+.tag-c{background:rgba(61,200,214,.1);color:var(--a6);border-color:rgba(61,200,214,.25);}
+
+/* ── SCHEDULE TABLE ── */
+.sch-wrap{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);overflow:auto;}
+.sch-tbl{width:100%;border-collapse:collapse;min-width:900px;}
+.sch-tbl th{padding:.6rem .75rem;text-align:center;font-family:var(--fm);font-size:.62rem;color:var(--tx3);border-bottom:1px solid var(--bdr);border-right:1px solid var(--bdr);text-transform:uppercase;background:var(--s2);white-space:nowrap;}
+.sch-tbl th:first-child{text-align:left;width:90px;}
+.sch-tbl td{padding:.4rem;border-bottom:1px solid var(--bdr);border-right:1px solid var(--bdr);vertical-align:top;min-width:130px;}
+.sch-tbl td:first-child{background:var(--s2);text-align:center;vertical-align:middle;padding:.5rem;min-width:90px;}
+.pair-label{font-family:var(--fm);font-size:.68rem;color:var(--a1);}
+.pair-time{font-family:var(--fm);font-size:.58rem;color:var(--tx3);}
+.lc{border-radius:6px;padding:.45rem .55rem;font-size:.72rem;line-height:1.45;cursor:pointer;transition:opacity .15s,transform .15s;margin-bottom:2px;}
+.lc:hover{opacity:.85;transform:translateY(-1px);}
+.lc .lc-sub{font-weight:600;color:var(--tx);}
+.lc .lc-info{font-family:var(--fm);font-size:.6rem;color:rgba(255,255,255,.55);margin-top:.15rem;}
+.lc .lc-room{font-size:.6rem;color:rgba(255,255,255,.4);}
+.t-lec{background:rgba(91,141,238,.14);border-left:3px solid var(--a1);}
+.t-prac{background:rgba(240,168,74,.14);border-left:3px solid var(--a2);}
+.t-lab{background:rgba(61,214,140,.14);border-left:3px solid var(--a3);}
+.t-sem{background:rgba(232,93,122,.14);border-left:3px solid var(--a4);}
+.t-kurs{background:rgba(176,110,243,.14);border-left:3px solid var(--a5);}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem;}
+.filter-bar select,.filter-bar input{background:var(--s2);border:1px solid var(--bdr);border-radius:7px;color:var(--tx);padding:.45rem .75rem;font-family:var(--fn);font-size:.8rem;outline:none;transition:border-color .18s;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--a1);}
+.filter-sep{width:1px;height:24px;background:var(--bdr);}
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:.75rem;}
+.leg-item{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--tx2);}
+.leg-dot{width:10px;height:10px;border-radius:2px;}
+
+/* ── CONFLICT ALERTS ── */
+.conflict-item{background:rgba(232,93,122,.06);border:1px solid rgba(232,93,122,.2);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:flex-start;gap:.75rem;font-size:.8rem;margin-bottom:.5rem;}
+.ci-icon{font-size:1rem;margin-top:.05rem;}
+.ci-body{flex:1;}
+.ci-body strong{color:var(--a4);}
+.ci-meta{font-family:var(--fm);font-size:.65rem;color:var(--tx3);margin-top:.2rem;}
+.ci-action{font-size:.68rem;font-family:var(--fm);color:var(--a1);cursor:pointer;text-decoration:underline;white-space:nowrap;}
+
+/* ── UTILIZATION ── */
+.util-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.65rem;}
+.util-card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--radius);padding:.85rem 1rem;transition:border-color .2s;}
+.util-card:hover{border-color:var(--bdr2);}
+.uc-name{font-family:var(--fm);font-size:.78rem;color:var(--tx);margin-bottom:.2rem;}
+.uc-type{font-size:.62rem;color:var(--tx3);margin-bottom:.5rem;}
+.uc-bar-bg{height:5px;background:var(--bdr);border-radius:3px;}
+.uc-bar{height:5px;border-radius:3px;transition:width .8s ease;}
+.uc-pct{font-family:var(--fm);font-size:.65rem;color:var(--tx3);margin-top:.3rem;}
+
+/* ── LOAD METER ── */
+.load-bar-bg{height:6px;background:var(--bdr);border-radius:3px;margin:.3rem 0;}
+.load-bar{height:6px;border-radius:3px;}
+
+/* ── MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:1.75rem;width:620px;max-width:96vw;max-height:92vh;overflow-y:auto;position:relative;}
+.modal-ttl{font-family:var(--fd);font-size:1.2rem;margin-bottom:1.4rem;padding-bottom:.85rem;border-bottom:1px solid var(--bdr);}
+.modal-x{position:absolute;top:1.2rem;right:1.2rem;background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1.1rem;transition:color .15s;}
+.modal-x:hover{color:var(--a4);}
+
+/* ── TABS ── */
+.inner-tabs{display:flex;gap:.35rem;margin-bottom:1.25rem;border-bottom:1px solid var(--bdr);flex-wrap:wrap;}
+.itab{padding:.5rem 1rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--tx2);cursor:pointer;font-family:var(--fn);font-size:.82rem;transition:all .18s;margin-bottom:-1px;}
+.itab:hover{color:var(--tx);}
+.itab.active{color:var(--a1);border-bottom-color:var(--a1);}
+.itab-content{display:none;}
+.itab-content.active{display:block;}
+
+/* ── NOTIF ── */
+.notif{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:var(--s2);border:1px solid var(--a3);border-radius:10px;padding:.75rem 1.2rem;font-size:.82rem;color:var(--a3);display:none;max-width:320px;box-shadow:var(--sh);}
+
+/* ── DASHBOARD GRID ── */
+.dash-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem;}
+.quick-list{display:flex;flex-direction:column;gap:.5rem;}
+.ql-item{background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;gap:.75rem;font-size:.8rem;}
+.ql-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── HEAT MAP ── */
+.heatmap{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;font-size:.6rem;font-family:var(--fm);}
+.hm-cell{border-radius:4px;height:28px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);}
+.hm-head{color:var(--tx3);height:20px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{width:60px;}
+  .sidebar-logo .logo-mark{font-size:0;}
+  .sidebar .logo-mark::first-letter{font-size:1.1rem;}
+  .nav-item span.label{display:none;}
+  .nav-item{justify-content:center;padding:.55rem;}
+  .sidebar-section,.sidebar-footer,.uni-selector{display:none;}
+  .main,.topbar{margin-left:60px;left:60px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .grid3,.grid4{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">Uni<span>Jadval</span></div>
+    <div class="logo-sub">v2.0 · Pro Tizim</div>
+  </div>
+
+  <div class="uni-selector">
+    <select id="uni-select" onchange="changeUniversity()">
+      <option value="ttu">Toshkent Texnika Universiteti</option>
+      <option value="nuu">NUU – Milliy Universitet</option>
+      <option value="tmu">Toshkent Tibbiyot Akademiyasi</option>
+      <option value="tdpu">TDPU</option>
+    </select>
+  </div>
+
+  <div class="sidebar-section">Asosiy</div>
+  <button class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span><span class="label">Bosh sahifa</span></button>
+  <button class="nav-item" onclick="showPage('schedule')"><span class="icon">📅</span><span class="label">Dars jadvali</span></button>
+  <button class="nav-item" onclick="showPage('conflicts')"><span class="icon">⚠️</span><span class="label">Konfliktlar</span><span class="nav-badge" id="conf-badge">0</span></button>
+
+  <div class="sidebar-section">Tuzilma</div>
+  <button class="nav-item" onclick="showPage('faculties')"><span class="icon">🏛</span><span class="label">Fakultetlar</span></button>
+  <button class="nav-item" onclick="showPage('departments')"><span class="icon">🔬</span><span class="label">Kafedralar</span></button>
+  <button class="nav-item" onclick="showPage('groups')"><span class="icon">👥</span><span class="label">Guruhlar</span></button>
+
+  <div class="sidebar-section">Resurslar</div>
+  <button class="nav-item" onclick="showPage('teachers')"><span class="icon">👨‍🏫</span><span class="label">O'qituvchilar</span></button>
+  <button class="nav-item" onclick="showPage('subjects')"><span class="icon">📚</span><span class="label">Fanlar</span></button>
+  <button class="nav-item" onclick="showPage('rooms')"><span class="icon">🏫</span><span class="label">Xonalar</span></button>
+  <button class="nav-item" onclick="showPage('buildings')"><span class="icon">🏢</span><span class="label">Binolar</span></button>
+
+  <div class="sidebar-section">Tahlil</div>
+  <button class="nav-item" onclick="showPage('analytics')"><span class="icon">📈</span><span class="label">Tahlil</span></button>
+  <button class="nav-item" onclick="showPage('export')"><span class="icon">📤</span><span class="label">Eksport</span></button>
+
+  <div class="sidebar-footer">
+    <div class="sem-info">
+      <div class="sem-label">Joriy semestr</div>
+      <div class="sem-val" id="sem-display">2024–25 / 2-sem</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="topbar-title" id="topbar-title">Bosh sahifa</div>
+  <div class="topbar-chips">
+    <span class="chip ok" id="chip-ok">✓ Tizim normal</span>
+    <span class="chip" id="chip-sem">2-semestr • 2024-25</span>
+    <span class="chip" id="chip-week">Hafta: Toq</span>
+  </div>
+</header>
+
+<!-- ══ MAIN CONTENT ══ -->
+<main class="main">
+
+<!-- ─── DASHBOARD ─── -->
+<div class="page active" id="page-dashboard">
+  <div class="stats-row">
+    <div class="stat-card sc-c1"><div class="stat-label">Fakultetlar</div><div class="stat-val c1" id="s-fac">0</div><div class="stat-sub">Universitetda</div></div>
+    <div class="stat-card sc-c2"><div class="stat-label">Kafedralar</div><div class="stat-val c2" id="s-dep">0</div><div class="stat-sub">Jami</div></div>
+    <div class="stat-card sc-c3"><div class="stat-label">Guruhlar</div><div class="stat-val c3" id="s-grp">0</div><div class="stat-sub">Aktiv</div></div>
+    <div class="stat-card sc-c4"><div class="stat-label">O'qituvchilar</div><div class="stat-val c4" id="s-tea">0</div><div class="stat-sub">Ro'yxatda</div></div>
+    <div class="stat-card sc-c5"><div class="stat-label">Darslar / hafta</div><div class="stat-val c5" id="s-les">0</div><div class="stat-sub">Jadvallashtirilgan</div></div>
+  </div>
+
+  <div class="dash-grid">
+    <div>
+      <div class="sec-title">📋 Haftalik dars jadvali (umumiy ko'rinish)</div>
+      <div class="sch-wrap">
+        <table class="sch-tbl">
+          <thead><tr>
+            <th>Juft/Vaqt</th>
+            <th>Dushanba</th><th>Seshanba</th><th>Chorshanba</th><th>Payshanba</th><th>Juma</th>
+          </tr></thead>
+          <tbody id="dash-sch-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="sec-title">🚀 Tezkor ma'lumot</div>
+      <div class="quick-list" id="quick-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SCHEDULE ─── -->
+<div class="page" id="page-schedule">
+  <div class="filter-bar">
+    <select id="f-faculty" onchange="filterDeps();renderSch()"><option value="">— Fakultet —</option></select>
+    <select id="f-dep" onchange="renderSch()"><option value="">— Kafedra —</option></select>
+    <select id="f-group" onchange="renderSch()"><option value="">— Guruh —</option></select>
+    <div class="filter-sep"></div>
+    <select id="f-teacher" onchange="renderSch()"><option value="">— O'qituvchi —</option></select>
+    <select id="f-room" onchange="renderSch()"><option value="">— Xona —</option></select>
+    <div class="filter-sep"></div>
+    <select id="f-week" onchange="renderSch()">
+      <option value="all">Har hafta</option>
+      <option value="odd">Toq hafta</option>
+      <option value="even">Juft hafta</option>
+    </select>
+    <button class="btn btn-p btn-sm" onclick="openLessonModal()">＋ Dars qo'shish</button>
+    <button class="btn btn-g btn-sm" onclick="autoSchedule()">🤖 Avto-jadval</button>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--a1)"></div>Ma'ruza</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--a2)"></div>Amaliy</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--a3)"></div>Laboratoriya</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--a4)"></div>Seminar</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--a5)"></div>Kurs ishi</div>
+  </div>
+  <div class="sch-wrap">
+    <table class="sch-tbl">
+      <thead><tr>
+        <th>Juft/Vaqt</th>
+        <th>Dushanba</th><th>Seshanba</th><th>Chorshanba</th><th>Payshanba</th><th>Juma</th>
+      </tr></thead>
+      <tbody id="main-sch-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── CONFLICTS ─── -->
+<div class="page" id="page-conflicts">
+  <div class="filter-bar">
+    <select id="cf-fac" onchange="renderConflictPage()"><option value="">— Barcha fakultetlar —</option></select>
+    <span style="font-size:.8rem;color:var(--tx2)">Topilgan konfliktlar avtomatik ko'rsatiladi</span>
+    <button class="btn btn-r btn-sm" onclick="resolveAll()">⚡ Hammasini hal qilish</button>
+  </div>
+  <div id="conflict-list-full"></div>
+</div>
+
+<!-- ─── FACULTIES ─── -->
+<div class="page" id="page-faculties">
+  <div class="panel">
+    <div class="panel-title">🏛 Fakultet qo'shish</div>
+    <div class="grid3">
+      <div class="fg"><label>Fakultet nomi</label><input id="fac-name" placeholder="Tabiiy fanlar fakulteti"></div>
+      <div class="fg"><label>Qisqa nomi (kod)</label><input id="fac-code" placeholder="TFF"></div>
+      <div class="fg"><label>Dekan</label><input id="fac-dean" placeholder="Prof. Karimov B."></div>
+      <div class="fg"><label>Tashkil etilgan yil</label><input id="fac-year" type="number" placeholder="1990"></div>
+      <div class="fg"><label>Telefon</label><input id="fac-phone" placeholder="+998 71 XXX XX XX"></div>
+      <div class="fg"><label>Email</label><input id="fac-email" placeholder="faculty@uni.uz"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addFaculty()">Qo'shish</button>
+      <button class="btn btn-s" onclick="clearForm('fac')">Tozalash</button>
+    </div>
+  </div>
+  <div class="sec-title">Fakultetlar ro'yxati <span class="cnt" id="fac-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Kod</th><th>Nomi</th><th>Dekan</th><th>Kafedralar</th><th>Guruhlar</th><th>Telefon</th><th>Amallar</th></tr></thead>
+      <tbody id="fac-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── DEPARTMENTS ─── -->
+<div class="page" id="page-departments">
+  <div class="panel">
+    <div class="panel-title">🔬 Kafedra qo'shish</div>
+    <div class="grid3">
+      <div class="fg"><label>Kafedra nomi</label><input id="dep-name" placeholder="Algebra va geometriya kafedrasi"></div>
+      <div class="fg"><label>Fakultet</label><select id="dep-fac"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Kafedra mudiri</label><input id="dep-head" placeholder="Dotsent Rahimova N."></div>
+      <div class="fg"><label>Qisqa kod</label><input id="dep-code" placeholder="ALG"></div>
+      <div class="fg"><label>Bino</label><select id="dep-building"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Xona raqami (kafedra)</label><input id="dep-room" placeholder="315"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addDepartment()">Qo'shish</button>
+      <button class="btn btn-s" onclick="clearForm('dep')">Tozalash</button>
+    </div>
+  </div>
+  <div class="sec-title">Kafedralar ro'yxati <span class="cnt" id="dep-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Kod</th><th>Kafedra nomi</th><th>Fakultet</th><th>Mudiri</th><th>O'qituvchilar</th><th>Fanlar</th><th>Amallar</th></tr></thead>
+      <tbody id="dep-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── GROUPS ─── -->
+<div class="page" id="page-groups">
+  <div class="panel">
+    <div class="panel-title">👥 Guruh qo'shish</div>
+    <div class="grid4">
+      <div class="fg"><label>Guruh nomi</label><input id="g-name" placeholder="MTF-23-01"></div>
+      <div class="fg"><label>Fakultet</label><select id="g-fac" onchange="fillGrpDep()"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Kafedra</label><select id="g-dep"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Yo'nalish</label><input id="g-dir" placeholder="Matematika va informatika"></div>
+      <div class="fg"><label>Kurs</label><select id="g-year"><option>1-kurs</option><option>2-kurs</option><option>3-kurs</option><option>4-kurs</option><option>Magistratura 1</option><option>Magistratura 2</option></select></div>
+      <div class="fg"><label>Ta'lim shakli</label><select id="g-form"><option>Kunduzgi</option><option>Sirtqi</option><option>Kechki</option><option>Masofaviy</option></select></div>
+      <div class="fg"><label>Talabalar soni</label><input id="g-count" type="number" placeholder="25"></div>
+      <div class="fg"><label>Guruh boshlig'i</label><input id="g-lead" placeholder="Ismi sharifi"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addGroup()">Qo'shish</button>
+      <button class="btn btn-s" onclick="clearForm('g')">Tozalash</button>
+    </div>
+  </div>
+  <div class="filter-bar" style="margin-top:.5rem">
+    <select id="gf-fac" onchange="renderGroups()"><option value="">— Barcha fakultetlar —</option></select>
+    <select id="gf-dep" onchange="renderGroups()"><option value="">— Barcha kafedralar —</option></select>
+    <select id="gf-year" onchange="renderGroups()"><option value="">— Barcha kurslar —</option><option>1-kurs</option><option>2-kurs</option><option>3-kurs</option><option>4-kurs</option></select>
+  </div>
+  <div class="sec-title">Guruhlar ro'yxati <span class="cnt" id="grp-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Guruh</th><th>Fakultet</th><th>Kafedra</th><th>Yo'nalish</th><th>Kurs</th><th>Shakli</th><th>Talabalar</th><th>Amallar</th></tr></thead>
+      <tbody id="grp-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── TEACHERS ─── -->
+<div class="page" id="page-teachers">
+  <div class="panel">
+    <div class="panel-title">👨‍🏫 O'qituvchi qo'shish</div>
+    <div class="grid4">
+      <div class="fg"><label>F.I.O.</label><input id="t-name" placeholder="Karimov Bahodir Salimovich"></div>
+      <div class="fg"><label>Kafedra</label><select id="t-dep"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Lavozim</label>
+        <select id="t-rank"><option>Professor</option><option>Dotsent</option><option>Katta o'qituvchi</option><option>O'qituvchi</option><option>Assistent</option><option>Soatbay</option></select>
+      </div>
+      <div class="fg"><label>Ilmiy daraja</label>
+        <select id="t-degree"><option>Fan doktori</option><option>Fan nomzodi (PhD)</option><option>Magistr</option><option>Bakalavr</option><option>—</option></select>
+      </div>
+      <div class="fg"><label>Telefon</label><input id="t-phone" placeholder="+998 90 123 45 67"></div>
+      <div class="fg"><label>Email</label><input id="t-email" placeholder="teacher@uni.uz"></div>
+      <div class="fg"><label>Max haftalik soat</label><input id="t-maxh" type="number" placeholder="18" min="4" max="36"></div>
+      <div class="fg"><label>Band kunlar</label><input id="t-busy" placeholder="Seshanba, Juma"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addTeacher()">Qo'shish</button>
+      <button class="btn btn-s" onclick="clearForm('t')">Tozalash</button>
+    </div>
+  </div>
+  <div class="filter-bar" style="margin-top:.5rem">
+    <select id="tf-dep" onchange="renderTeachers()"><option value="">— Barcha kafedralar —</option></select>
+    <select id="tf-rank" onchange="renderTeachers()"><option value="">— Barcha lavozimlar —</option><option>Professor</option><option>Dotsent</option><option>Katta o'qituvchi</option><option>O'qituvchi</option><option>Assistent</option></select>
+  </div>
+  <div class="sec-title">O'qituvchilar ro'yxati <span class="cnt" id="tea-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>F.I.O.</th><th>Kafedra</th><th>Lavozim</th><th>Daraja</th><th>Telefon</th><th>Max soat</th><th>Band soat</th><th>Holat</th><th>Amallar</th></tr></thead>
+      <tbody id="tea-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SUBJECTS ─── -->
+<div class="page" id="page-subjects">
+  <div class="panel">
+    <div class="panel-title">📚 Fan qo'shish</div>
+    <div class="grid4">
+      <div class="fg"><label>Fan nomi</label><input id="sub-name" placeholder="Oliy matematika"></div>
+      <div class="fg"><label>Kod</label><input id="sub-code" placeholder="MTH101"></div>
+      <div class="fg"><label>Kafedra</label><select id="sub-dep"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Fan turi</label><select id="sub-type"><option>Majburiy</option><option>Tanlov</option><option>Ixtisoslik</option><option>Umumta'lim</option></select></div>
+      <div class="fg"><label>Kredit soat</label><input id="sub-credit" type="number" placeholder="5" min="1" max="10"></div>
+      <div class="fg"><label>Ma'ruza soat/hafta</label><input id="sub-lec" type="number" placeholder="2" min="0"></div>
+      <div class="fg"><label>Amaliy soat/hafta</label><input id="sub-prac" type="number" placeholder="2" min="0"></div>
+      <div class="fg"><label>Lab soat/hafta</label><input id="sub-lab" type="number" placeholder="0" min="0"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addSubject()">Qo'shish</button>
+      <button class="btn btn-s" onclick="clearForm('sub')">Tozalash</button>
+    </div>
+  </div>
+  <div class="filter-bar" style="margin-top:.5rem">
+    <select id="sf-dep" onchange="renderSubjects()"><option value="">— Barcha kafedralar —</option></select>
+    <select id="sf-type" onchange="renderSubjects()"><option value="">— Barcha turlar —</option><option>Majburiy</option><option>Tanlov</option><option>Ixtisoslik</option></select>
+  </div>
+  <div class="sec-title">Fanlar ro'yxati <span class="cnt" id="sub-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Kod</th><th>Fan nomi</th><th>Kafedra</th><th>Turi</th><th>Kredit</th><th>Ma'ruza</th><th>Amaliy</th><th>Lab</th><th>Amallar</th></tr></thead>
+      <tbody id="sub-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── ROOMS ─── -->
+<div class="page" id="page-rooms">
+  <div class="panel">
+    <div class="panel-title">🏫 Xona qo'shish</div>
+    <div class="grid4">
+      <div class="fg"><label>Xona raqami</label><input id="r-num" placeholder="101-A"></div>
+      <div class="fg"><label>Bino</label><select id="r-bld"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Xona turi</label>
+        <select id="r-type"><option>Auditoriya</option><option>Laboratoriya</option><option>Kompyuter xona</option><option>Amfiteattr</option><option>Seminar xona</option><option>Ma'ruza zali</option></select>
+      </div>
+      <div class="fg"><label>Sig'im (kishi)</label><input id="r-cap" type="number" placeholder="30" min="5"></div>
+      <div class="fg"><label>Jihozlar</label><input id="r-equip" placeholder="Proyektor, dоska, AC"></div>
+      <div class="fg"><label>Kafedra (ixt.)</label><select id="r-dep"><option value="">Umumiy</option></select></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="addRoom()">Qo'shish</button>
+    </div>
+  </div>
+  <div class="sec-title">Xona bandligi</div>
+  <div class="util-grid" id="room-util-grid" style="margin-bottom:1.25rem"></div>
+  <div class="sec-title">Xonalar ro'yxati <span class="cnt" id="room-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Raqam</th><th>Bino</th><th>Turi</th><th>Sig'im</th><th>Jihozlar</th><th>Bandlik</th><th>Amallar</th></tr></thead>
+      <tbody id="room-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── BUILDINGS ─── -->
+<div class="page" id="page-buildings">
+  <div class="panel">
+    <div class="panel-title">🏢 Bino qo'shish</div>
+    <div class="grid3">
+      <div class="fg"><label>Bino nomi</label><input id="b-name" placeholder="Asosiy o'quv binosi"></div>
+      <div class="fg"><label>Qisqa nom</label><input id="b-code" placeholder="AOB"></div>
+      <div class="fg"><label>Manzil</label><input id="b-addr" placeholder="Universitet ko'chasi, 4"></div>
+      <div class="fg"><label>Qavatlar soni</label><input id="b-floors" type="number" placeholder="5"></div>
+      <div class="fg"><label>Xonalar soni (umumiy)</label><input id="b-rooms" type="number" placeholder="60"></div>
+      <div class="fg"><label>Ma'sul shaxs</label><input id="b-resp" placeholder="Xo'jayev A."></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-p" onclick="addBuilding()">Qo'shish</button></div>
+  </div>
+  <div class="sec-title">Binolar ro'yxati <span class="cnt" id="bld-cnt"></span></div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Kod</th><th>Nomi</th><th>Manzil</th><th>Qavatlar</th><th>Jami xonalar</th><th>Ma'sul</th><th>Amallar</th></tr></thead>
+      <tbody id="bld-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── ANALYTICS ─── -->
+<div class="page" id="page-analytics">
+  <div class="stats-row">
+    <div class="stat-card sc-c1"><div class="stat-label">Jami darslar</div><div class="stat-val c1" id="an-les">0</div><div class="stat-sub">Jadvallashtirilgan</div></div>
+    <div class="stat-card sc-c2"><div class="stat-label">Xona bandligi</div><div class="stat-val c2" id="an-ru">0%</div><div class="stat-sub">O'rtacha</div></div>
+    <div class="stat-card sc-c3"><div class="stat-label">O'qituvchi yukl.</div><div class="stat-val c3" id="an-tl">0%</div><div class="stat-sub">O'rtacha</div></div>
+    <div class="stat-card sc-c4"><div class="stat-label">Konfliktlar</div><div class="stat-val c4" id="an-cf">0</div><div class="stat-sub">Hal qilinmagan</div></div>
+    <div class="stat-card sc-c5"><div class="stat-label">Talabalar</div><div class="stat-val c5" id="an-st">0</div><div class="stat-sub">Jami</div></div>
+  </div>
+
+  <div class="sec-title">📊 O'qituvchi yuklamasi</div>
+  <div class="tbl-wrap" style="margin-bottom:1.25rem">
+    <table class="dtbl">
+      <thead><tr><th>O'qituvchi</th><th>Kafedra</th><th>Lavozim</th><th>Yuklama (soat)</th><th>Max soat</th><th>Holat</th></tr></thead>
+      <tbody id="an-tea-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="sec-title">🏫 Kafedra bo'yicha darslar</div>
+  <div class="tbl-wrap">
+    <table class="dtbl">
+      <thead><tr><th>Kafedra</th><th>Fakultet</th><th>Jami darslar</th><th>O'qituvchilar</th><th>Guruhlar</th><th>Band soat %</th></tr></thead>
+      <tbody id="an-dep-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── EXPORT ─── -->
+<div class="page" id="page-export">
+  <div class="inner-tabs">
+    <button class="itab active" onclick="switchItab(this,'exp-all')">Umumiy</button>
+    <button class="itab" onclick="switchItab(this,'exp-fac')">Fakultet bo'yicha</button>
+    <button class="itab" onclick="switchItab(this,'exp-group')">Guruh bo'yicha</button>
+  </div>
+
+  <div class="itab-content active" id="exp-all">
+    <div class="panel">
+      <div class="panel-title">📤 To'liq ma'lumot bazasini eksport qilish</div>
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="exportAll('json')">⬇ JSON (to'liq)</button>
+        <button class="btn btn-g" onclick="exportAll('csv-lessons')">⬇ CSV (darslar)</button>
+        <button class="btn btn-o" onclick="exportAll('csv-teachers')">⬇ CSV (o'qituvchilar)</button>
+        <button class="btn btn-s" onclick="window.print()">🖨 Chop etish</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card sc-c1"><div class="stat-label">Jami darslar</div><div class="stat-val c1" id="ex-l">0</div></div>
+      <div class="stat-card sc-c2"><div class="stat-label">Guruhlar</div><div class="stat-val c2" id="ex-g">0</div></div>
+      <div class="stat-card sc-c3"><div class="stat-label">Fanlar</div><div class="stat-val c3" id="ex-s">0</div></div>
+      <div class="stat-card sc-c4"><div class="stat-label">O'qituvchilar</div><div class="stat-val c4" id="ex-t">0</div></div>
+      <div class="stat-card sc-c5"><div class="stat-label">Xonalar</div><div class="stat-val c5" id="ex-r">0</div></div>
+    </div>
+  </div>
+
+  <div class="itab-content" id="exp-fac">
+    <div class="panel">
+      <div class="panel-title">🏛 Fakultet jadvali</div>
+      <div class="filter-bar" style="margin-bottom:1rem">
+        <select id="ef-fac"><option value="">Tanlang</option></select>
+        <button class="btn btn-p btn-sm" onclick="exportFaculty()">⬇ Eksport</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="itab-content" id="exp-group">
+    <div class="panel">
+      <div class="panel-title">👥 Guruh jadvali</div>
+      <div class="filter-bar" style="margin-bottom:1rem">
+        <select id="eg-group"><option value="">Tanlang</option></select>
+        <button class="btn btn-p btn-sm" onclick="exportGroup()">⬇ Eksport</button>
+      </div>
+      <div id="group-sch-preview"></div>
+    </div>
+  </div>
+</div>
+
+</main><!-- /main -->
+
+<!-- ══ MODAL: Dars qo'shish/tahrirlash ══ -->
+<div class="modal-ov" id="lesson-modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-ttl" id="modal-lesson-title">📅 Dars qo'shish</div>
+    <div class="grid4" style="margin-bottom:.85rem">
+      <div class="fg"><label>Fakultet</label><select id="ml-fac" onchange="mlFilterDep()"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Kafedra</label><select id="ml-dep" onchange="mlFilterGroup()"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Guruh</label><select id="ml-group"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Fan</label><select id="ml-sub"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>O'qituvchi</label><select id="ml-tea"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Xona</label><select id="ml-room"><option value="">Tanlang</option></select></div>
+      <div class="fg"><label>Kun</label>
+        <select id="ml-day"><option value="0">Dushanba</option><option value="1">Seshanba</option><option value="2">Chorshanba</option><option value="3">Payshanba</option><option value="4">Juma</option></select>
+      </div>
+      <div class="fg"><label>Juft (para)</label>
+        <select id="ml-pair">
+          <option value="0">1-juft 08:00–09:30</option>
+          <option value="1">2-juft 09:45–11:15</option>
+          <option value="2">3-juft 11:30–13:00</option>
+          <option value="3">4-juft 13:45–15:15</option>
+          <option value="4">5-juft 15:30–17:00</option>
+          <option value="5">6-juft 17:15–18:45</option>
+        </select>
+      </div>
+      <div class="fg"><label>Dars turi</label>
+        <select id="ml-type"><option value="lec">Ma'ruza</option><option value="prac">Amaliy</option><option value="lab">Laboratoriya</option><option value="sem">Seminar</option><option value="kurs">Kurs ishi</option></select>
+      </div>
+      <div class="fg"><label>Hafta</label>
+        <select id="ml-week"><option value="all">Har hafta</option><option value="odd">Toq hafta</option><option value="even">Juft hafta</option></select>
+      </div>
+    </div>
+    <div id="modal-conflict-warn" style="display:none" class="conflict-item" style="margin-bottom:.75rem">
+      <span class="ci-icon">⚠️</span><span class="ci-body" id="modal-conf-text"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="saveLesson()">✔ Saqlash</button>
+      <button class="btn btn-s" onclick="closeModal()">Bekor qilish</button>
+      <button class="btn btn-r" id="modal-del-btn" style="display:none" onclick="deleteLesson()">🗑 O'chirish</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  buildings:[],faculties:[],departments:[],groups:[],
+  teachers:[],subjects:[],rooms:[],lessons:[],
+  editingLesson:null
+};
+let _uid=500;
+const uid=()=>++_uid;
+
+const DAYS=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma'];
+const PAIRS=['08:00–09:30','09:45–11:15','11:30–13:00','13:45–15:15','15:30–17:00','17:15–18:45'];
+const TCSS={lec:'t-lec',prac:'t-prac',lab:'t-lab',sem:'t-sem',kurs:'t-kurs'};
+const TLBL={lec:"Ma'ruza",prac:'Amaliy',lab:'Laboratoriya',sem:'Seminar',kurs:'Kurs ishi'};
+
+// ═══════════════════════════════════════════════════════
+//  SEED
+// ═══════════════════════════════════════════════════════
+function seed(){
+  S.buildings=[
+    {id:1,name:"Asosiy o'quv binosi",code:'AOB',addr:"Universitet ko'chasi, 4",floors:5,totalRooms:80,resp:'Xo\'jayev A.'},
+    {id:2,name:'Laboratoriya binosi',code:'LAB',addr:'Ilm ko\'chasi, 6',floors:3,totalRooms:40,resp:'Toshev B.'},
+    {id:3,name:'Gumanitar binosi',code:'GUB',addr:'Universitet ko\'chasi, 4A',floors:4,totalRooms:50,resp:'Mirzayev S.'},
+  ];
+  S.faculties=[
+    {id:1,name:'Tabiiy fanlar fakulteti',code:'TFF',dean:"Prof. Karimov B.",year:1966,phone:'+998711234567',email:'tff@uni.uz'},
+    {id:2,name:'Gumanitar fanlar fakulteti',code:'GFF',dean:"Dotsent Rahimova N.",year:1971,phone:'+998711234568',email:'gff@uni.uz'},
+    {id:3,name:'Texnika va texnologiya',code:'TTF',dean:"Prof. Toshmatov S.",year:1985,phone:'+998711234569',email:'ttf@uni.uz'},
+    {id:4,name:"Iqtisodiyot va boshqaruv",code:'IBF',dean:"Dotsent Yusupov K.",year:1992,phone:'+998711234570',email:'ibf@uni.uz'},
+  ];
+  S.departments=[
+    {id:1,name:'Algebra va geometriya',code:'ALG',facId:1,head:'Dotsent Azimov A.',buildingId:1,room:'210'},
+    {id:2,name:'Matematika tahlili',code:'MTA',facId:1,head:"Prof. Karimov B.",buildingId:1,room:'212'},
+    {id:3,name:'Fizika',code:'FIZ',facId:1,head:'Prof. Sobirov O.',buildingId:2,room:'102'},
+    {id:4,name:'Informatika va DT',code:'INF',facId:1,head:"Dotsent Xolmatov I.",buildingId:2,room:'201'},
+    {id:5,name:"O'zbek tili va adabiyoti",code:'UZB',facId:2,head:"Dotsent Umarova Z.",buildingId:3,room:'305'},
+    {id:6,name:'Jahon tarixi',code:'TAR',facId:2,head:'Prof. Nazarov R.',buildingId:3,room:'310'},
+    {id:7,name:'Dasturiy muhandislik',code:'DAS',facId:3,head:"Dotsent Qodirov J.",buildingId:2,room:'215'},
+    {id:8,name:'Iqtisodiy nazariya',code:'IQT',facId:4,head:"Dotsent Holiqov M.",buildingId:3,room:'401'},
+  ];
+  S.rooms=[
+    {id:1,num:'101-A',buildingId:1,type:'Auditoriya',cap:30,equip:'Proyektor, dоska',depId:null},
+    {id:2,num:'202-B',buildingId:1,type:'Seminar xona',cap:25,equip:'Dоska',depId:1},
+    {id:3,num:'Lab-1',buildingId:2,type:'Laboratoriya',cap:20,equip:'Kompyuterlar, mikroskoplar',depId:3},
+    {id:4,num:'Amp-1',buildingId:1,type:'Amfiteattr',cap:120,equip:'Mikrofon, ekran, AC',depId:null},
+    {id:5,num:'Komp-1',buildingId:2,type:'Kompyuter xona',cap:24,equip:'24 ta PC, printer',depId:4},
+    {id:6,num:'303-C',buildingId:3,type:'Auditoriya',cap:35,equip:'Proyektor, aqlli taхta',depId:null},
+    {id:7,num:'401-D',buildingId:3,type:'Seminar xona',cap:20,equip:'Dоska',depId:8},
+    {id:8,num:'Lab-2',buildingId:2,type:'Laboratoriya',cap:18,equip:'Fizika jihozlari',depId:3},
+  ];
+  S.teachers=[
+    {id:1,name:'Karimov Bahodir Salimovich',depId:2,rank:'Professor',degree:"Fan doktori",phone:'+998901234501',email:'karimov@uni.uz',maxH:18,busy:''},
+    {id:2,name:'Rahimova Nilufar Toxirovna',depId:3,rank:'Dotsent',degree:'PhD',phone:'+998901234502',email:'rahimova@uni.uz',maxH:16,busy:'Seshanba'},
+    {id:3,name:"Xolmatov Ilhom Rustamovich",depId:4,rank:"Katta o'qituvchi",degree:'Magistr',phone:'+998901234503',email:'xolmatov@uni.uz',maxH:20,busy:''},
+    {id:4,name:'Umarova Zulfiya Baxtiyor',depId:5,rank:"O'qituvchi",degree:'Magistr',phone:'+998901234504',email:'umarova@uni.uz',maxH:16,busy:'Juma'},
+    {id:5,name:'Sobirov Otabek Hamidovich',depId:3,rank:'Professor',degree:"Fan doktori",phone:'+998901234505',email:'sobirov@uni.uz',maxH:14,busy:''},
+    {id:6,name:"Qodirov Javlon Nishonovich",depId:7,rank:'Dotsent',degree:'PhD',phone:'+998901234506',email:'qodirov@uni.uz',maxH:18,busy:'Chorshanba'},
+    {id:7,name:'Nazarov Rustam Alisher',depId:6,rank:'Professor',degree:"Fan doktori",phone:'+998901234507',email:'nazarov@uni.uz',maxH:14,busy:''},
+    {id:8,name:"Holiqov Mansur Erkinov",depId:8,rank:'Dotsent',degree:'PhD',phone:'+998901234508',email:'holiqov@uni.uz',maxH:18,busy:'Payshanba'},
+  ];
+  S.subjects=[
+    {id:1,name:'Oliy matematika I',code:'MTH101',depId:2,type:'Majburiy',credit:5,lec:2,prac:2,lab:0},
+    {id:2,name:'Fizika I',code:'PHY101',depId:3,type:'Majburiy',credit:4,lec:2,prac:0,lab:2},
+    {id:3,name:'Informatika asoslari',code:'INF101',depId:4,type:'Majburiy',credit:3,lec:1,prac:0,lab:2},
+    {id:4,name:"O'zbek tili",code:'UZB101',depId:5,type:'Majburiy',credit:2,lec:1,prac:1,lab:0},
+    {id:5,name:'Jahon tarixi',code:'HIS101',depId:6,type:'Majburiy',credit:2,lec:2,prac:0,lab:0},
+    {id:6,name:'Dasturlash tillari',code:'DAS201',depId:7,type:'Ixtisoslik',credit:4,lec:2,prac:0,lab:2},
+    {id:7,name:'Iqtisodiyot nazariyasi',code:'IQT101',depId:8,type:'Majburiy',credit:3,lec:2,prac:1,lab:0},
+    {id:8,name:'Algebra I',code:'ALG101',depId:1,type:'Majburiy',credit:4,lec:2,prac:2,lab:0},
+  ];
+  S.groups=[
+    {id:1,name:'MTF-24-01',facId:1,depId:2,dir:'Matematika',year:'1-kurs',form:'Kunduzgi',count:25,lead:'Aliyev A.'},
+    {id:2,name:'MTF-24-02',facId:1,depId:2,dir:'Matematika',year:'1-kurs',form:'Kunduzgi',count:23,lead:'Baxtiyorov B.'},
+    {id:3,name:'FIZ-23-01',facId:1,depId:3,dir:'Fizika',year:'2-kurs',form:'Kunduzgi',count:18,lead:'Qosimov Q.'},
+    {id:4,name:'INF-24-01',facId:1,depId:4,dir:'Informatika',year:'1-kurs',form:'Kunduzgi',count:28,lead:'Xoliqov X.'},
+    {id:5,name:'UZB-23-01',facId:2,depId:5,dir:"O'zbek filologiyasi",year:'2-kurs',form:'Kunduzgi',count:30,lead:'Mirzayeva M.'},
+    {id:6,name:'TAR-23-01',facId:2,depId:6,dir:'Tarix',year:'2-kurs',form:'Kunduzgi',count:22,lead:'Nazarova N.'},
+    {id:7,name:'DAS-24-01',facId:3,depId:7,dir:"Dasturiy muhandislik",year:'1-kurs',form:'Kunduzgi',count:24,lead:'Qodirov J.'},
+    {id:8,name:'IQT-23-01',facId:4,depId:8,dir:'Iqtisodiyot',year:'2-kurs',form:'Kunduzgi',count:27,lead:'Holiqov H.'},
+  ];
+  S.lessons=[
+    {id:1,groupId:1,subjectId:1,teacherId:1,roomId:4,day:0,pair:0,type:'lec',week:'all'},
+    {id:2,groupId:1,subjectId:1,teacherId:1,roomId:2,day:2,pair:1,type:'prac',week:'odd'},
+    {id:3,groupId:1,subjectId:2,teacherId:2,roomId:4,day:1,pair:0,type:'lec',week:'all'},
+    {id:4,groupId:1,subjectId:2,teacherId:5,roomId:8,day:3,pair:2,type:'lab',week:'even'},
+    {id:5,groupId:1,subjectId:3,teacherId:3,roomId:5,day:4,pair:1,type:'lab',week:'all'},
+    {id:6,groupId:1,subjectId:4,teacherId:4,roomId:1,day:0,pair:2,type:'lec',week:'all'},
+    {id:7,groupId:2,subjectId:1,teacherId:1,roomId:1,day:1,pair:1,type:'lec',week:'all'},
+    {id:8,groupId:2,subjectId:3,teacherId:3,roomId:5,day:3,pair:0,type:'lab',week:'all'},
+    {id:9,groupId:3,subjectId:2,teacherId:5,roomId:4,day:0,pair:0,type:'lec',week:'all'},
+    {id:10,groupId:3,subjectId:2,teacherId:2,roomId:8,day:2,pair:2,type:'lab',week:'odd'},
+    {id:11,groupId:4,subjectId:3,teacherId:3,roomId:5,day:1,pair:2,type:'lab',week:'all'},
+    {id:12,groupId:4,subjectId:6,teacherId:6,roomId:5,day:3,pair:1,type:'lab',week:'all'},
+    {id:13,groupId:5,subjectId:4,teacherId:4,roomId:6,day:0,pair:1,type:'lec',week:'all'},
+    {id:14,groupId:5,subjectId:5,teacherId:7,roomId:4,day:2,pair:0,type:'lec',week:'all'},
+    {id:15,groupId:6,subjectId:5,teacherId:7,roomId:6,day:1,pair:0,type:'lec',week:'all'},
+    {id:16,groupId:7,subjectId:6,teacherId:6,roomId:4,day:0,pair:0,type:'lec',week:'all'},
+    {id:17,groupId:7,subjectId:6,teacherId:6,roomId:5,day:2,pair:1,type:'lab',week:'all'},
+    {id:18,groupId:8,subjectId:7,teacherId:8,roomId:7,day:1,pair:1,type:'lec',week:'all'},
+    {id:19,groupId:8,subjectId:7,teacherId:8,roomId:7,day:3,pair:2,type:'prac',week:'all'},
+    // intentional conflict for demo
+    {id:20,groupId:2,subjectId:8,teacherId:1,roomId:4,day:1,pair:1,type:'lec',week:'all'},
+  ];
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+const byId=(arr,id)=>arr.find(x=>x.id===+id);
+function showNotif(msg,err){
+  const el=document.getElementById('notif');
+  el.textContent=msg;
+  el.style.borderColor=err?'var(--a4)':'var(--a3)';
+  el.style.color=err?'var(--a4)':'var(--a3)';
+  el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+function tagHtml(txt,cls){return`<span class="tag ${cls}">${txt}</span>`;}
+function loadColor(pct){return pct>90?'var(--a4)':pct>70?'var(--a2)':'var(--a3)';}
+
+// ═══════════════════════════════════════════════════════
+//  CONFLICT ENGINE
+// ═══════════════════════════════════════════════════════
+function detectConflicts(){
+  const c=[];const ls=S.lessons;
+  for(let i=0;i<ls.length;i++) for(let j=i+1;j<ls.length;j++){
+    const a=ls[i],b=ls[j];
+    if(a.day!==b.day||a.pair!==b.pair) continue;
+    const wc=(a.week==='all'||b.week==='all'||a.week===b.week);
+    if(!wc) continue;
+    if(a.teacherId===b.teacherId){
+      const t=byId(S.teachers,a.teacherId);
+      c.push({type:'teacher',icon:'👨‍🏫',ids:[a.id,b.id],
+        msg:`<strong>${t?.name}</strong> bir vaqtda ikkita dars bermoqda`,
+        meta:`${DAYS[a.day]}, ${PAIRS[a.pair]} • ${byId(S.subjects,a.subjectId)?.name} & ${byId(S.subjects,b.subjectId)?.name}`});
+    }
+    if(a.roomId===b.roomId){
+      const r=byId(S.rooms,a.roomId);
+      c.push({type:'room',icon:'🏫',ids:[a.id,b.id],
+        msg:`<strong>${r?.num}</strong> xona bir vaqtda ikki guruhga band`,
+        meta:`${DAYS[a.day]}, ${PAIRS[a.pair]}`});
+    }
+    if(a.groupId===b.groupId){
+      const g=byId(S.groups,a.groupId);
+      c.push({type:'group',icon:'👥',ids:[a.id,b.id],
+        msg:`<strong>${g?.name}</strong> guruhda bir vaqtda ikkita dars`,
+        meta:`${DAYS[a.day]}, ${PAIRS[a.pair]}`});
+    }
+  }
+  return c;
+}
+
+function renderConflictBadge(){
+  const n=detectConflicts().length;
+  document.getElementById('conf-badge').textContent=n;
+  document.getElementById('conf-badge').style.display=n?'':'none';
+  const ok=document.getElementById('chip-ok');
+  ok.textContent=n?`⚠ ${n} konflikt`:'✓ Tizim normal';
+  ok.className=`chip ${n?'warn':'ok'}`;
+}
+
+function renderConflictPage(){
+  const c=detectConflicts();
+  const el=document.getElementById('conflict-list-full');
+  if(!c.length){el.innerHTML='<div style="color:var(--a3);padding:1rem;font-size:.85rem">✓ Hozircha hech qanday konflikt yo\'q!</div>';return;}
+  el.innerHTML=c.map((x,i)=>`
+    <div class="conflict-item">
+      <span class="ci-icon">${x.icon}</span>
+      <div class="ci-body">${x.msg}<div class="ci-meta">${x.meta}</div></div>
+      <span class="ci-action" onclick="removeLessonConf(${x.ids[1]})">Darsni o'chirish</span>
+    </div>`).join('');
+}
+
+function removeLessonConf(id){
+  S.lessons=S.lessons.filter(l=>l.id!==id);
+  renderAll();showNotif('Dars o\'chirildi, konflikt hal qilindi ✓');
+}
+function resolveAll(){
+  const c=detectConflicts();
+  const ids=new Set(c.map(x=>x.ids[1]));
+  S.lessons=S.lessons.filter(l=>!ids.has(l.id));
+  renderAll();showNotif(`${ids.size} ta konflikt hal qilindi ✓`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCHEDULE RENDER
+// ═══════════════════════════════════════════════════════
+function filteredLessons(){
+  const fg=document.getElementById('f-faculty')?.value||'';
+  const fd=document.getElementById('f-dep')?.value||'';
+  const gg=document.getElementById('f-group')?.value||'';
+  const ft=document.getElementById('f-teacher')?.value||'';
+  const fr=document.getElementById('f-room')?.value||'';
+  const fw=document.getElementById('f-week')?.value||'all';
+  return S.lessons.filter(l=>{
+    if(fw!=='all'&&l.week!=='all'&&l.week!==fw) return false;
+    if(gg&&l.groupId!==+gg) return false;
+    if(ft&&l.teacherId!==+ft) return false;
+    if(fr&&l.roomId!==+fr) return false;
+    if(fd){const g=byId(S.groups,l.groupId);if(g?.depId!==+fd) return false;}
+    if(fg&&!fd){const g=byId(S.groups,l.groupId);if(g?.facId!==+fg) return false;}
+    return true;
+  });
+}
+
+function buildSchHtml(lessons,bodyId){
+  const body=document.getElementById(bodyId);
+  if(!body) return;
+  let h='';
+  for(let p=0;p<PAIRS.length;p++){
+    h+=`<tr><td><div class="pair-label">${p+1}-juft</div><div class="pair-time">${PAIRS[p]}</div></td>`;
+    for(let d=0;d<5;d++){
+      const cells=lessons.filter(l=>l.day===d&&l.pair===p);
+      h+=`<td>`;
+      cells.forEach(l=>{
+        const sub=byId(S.subjects,l.subjectId);
+        const tea=byId(S.teachers,l.teacherId);
+        const rm=byId(S.rooms,l.roomId);
+        const grp=byId(S.groups,l.groupId);
+        h+=`<div class="lc ${TCSS[l.type]}" onclick="editLesson(${l.id})">
+          <div class="lc-sub">${sub?.name||'—'}</div>
+          <div class="lc-info">${tea?.name?.split(' ')[0]||''} · ${grp?.name||''}</div>
+          <div class="lc-room">🚪 ${rm?.num||''} · ${TLBL[l.type]}</div>
+        </div>`;
+      });
+      h+=`</td>`;
+    }
+    h+=`</tr>`;
+  }
+  body.innerHTML=h;
+}
+
+function renderSch(){buildSchHtml(filteredLessons(),'main-sch-body');}
+function renderDashSch(){buildSchHtml(S.lessons,'dash-sch-body');}
+
+function filterDeps(){
+  const facId=document.getElementById('f-faculty')?.value;
+  const sel=document.getElementById('f-dep');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— Kafedra —</option>'+
+    S.departments.filter(d=>!facId||d.facId===+facId)
+    .map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  renderSch();
+}
+
+// ═══════════════════════════════════════════════════════
+//  BUILDINGS
+// ═══════════════════════════════════════════════════════
+function addBuilding(){
+  const name=document.getElementById('b-name').value.trim();
+  if(!name){showNotif('Bino nomini kiriting!',1);return;}
+  S.buildings.push({id:uid(),name,
+    code:document.getElementById('b-code').value,
+    addr:document.getElementById('b-addr').value,
+    floors:+document.getElementById('b-floors').value||3,
+    totalRooms:+document.getElementById('b-rooms').value||30,
+    resp:document.getElementById('b-resp').value
+  });
+  renderAll();showNotif('Bino qo\'shildi ✓');
+}
+function renderBuildings(){
+  const tb=document.getElementById('bld-tbody');
+  if(!tb) return;
+  tb.innerHTML=S.buildings.map(b=>`<tr>
+    <td>${tagHtml(b.code,'tag-c')}</td><td>${b.name}</td><td>${b.addr}</td>
+    <td>${b.floors}</td><td>${b.totalRooms}</td><td>${b.resp}</td>
+    <td><div class="acts"><button class="abtn del" onclick="delBuilding(${b.id})">O'chirish</button></div></td>
+  </tr>`).join('');
+  const cnt=document.getElementById('bld-cnt');
+  if(cnt) cnt.textContent=`(${S.buildings.length})`;
+}
+function delBuilding(id){S.buildings=S.buildings.filter(x=>x.id!==id);renderAll();showNotif('Bino o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  FACULTIES
+// ═══════════════════════════════════════════════════════
+function addFaculty(){
+  const name=document.getElementById('fac-name').value.trim();
+  if(!name){showNotif('Fakultet nomini kiriting!',1);return;}
+  S.faculties.push({id:uid(),name,
+    code:document.getElementById('fac-code').value,
+    dean:document.getElementById('fac-dean').value,
+    year:document.getElementById('fac-year').value,
+    phone:document.getElementById('fac-phone').value,
+    email:document.getElementById('fac-email').value
+  });
+  renderAll();showNotif('Fakultet qo\'shildi ✓');
+}
+function renderFaculties(){
+  const tb=document.getElementById('fac-tbody');
+  if(!tb) return;
+  tb.innerHTML=S.faculties.map(f=>{
+    const deps=S.departments.filter(d=>d.facId===f.id).length;
+    const grps=S.groups.filter(g=>g.facId===f.id).length;
+    return`<tr>
+      <td>${tagHtml(f.code,'tag-b')}</td><td><strong>${f.name}</strong></td>
+      <td>${f.dean}</td><td>${deps}</td><td>${grps}</td><td style="font-family:var(--fm)">${f.phone}</td>
+      <td><div class="acts"><button class="abtn del" onclick="delFaculty(${f.id})">O'chirish</button></div></td>
+    </tr>`;}).join('');
+  const cnt=document.getElementById('fac-cnt');
+  if(cnt) cnt.textContent=`(${S.faculties.length})`;
+}
+function delFaculty(id){S.faculties=S.faculties.filter(x=>x.id!==id);renderAll();showNotif('Fakultet o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  DEPARTMENTS
+// ═══════════════════════════════════════════════════════
+function addDepartment(){
+  const name=document.getElementById('dep-name').value.trim();
+  if(!name){showNotif('Kafedra nomini kiriting!',1);return;}
+  S.departments.push({id:uid(),name,
+    code:document.getElementById('dep-code').value,
+    facId:+document.getElementById('dep-fac').value||null,
+    head:document.getElementById('dep-head').value,
+    buildingId:+document.getElementById('dep-building').value||null,
+    room:document.getElementById('dep-room').value
+  });
+  renderAll();showNotif('Kafedra qo\'shildi ✓');
+}
+function renderDepartments(){
+  const tb=document.getElementById('dep-tbody');
+  if(!tb) return;
+  tb.innerHTML=S.departments.map(d=>{
+    const fac=byId(S.faculties,d.facId);
+    const teas=S.teachers.filter(t=>t.depId===d.id).length;
+    const subs=S.subjects.filter(s=>s.depId===d.id).length;
+    return`<tr>
+      <td>${tagHtml(d.code,'tag-p')}</td><td><strong>${d.name}</strong></td>
+      <td>${fac?tagHtml(fac.code,'tag-b'):'—'}</td><td>${d.head}</td>
+      <td style="text-align:center">${teas}</td><td style="text-align:center">${subs}</td>
+      <td><div class="acts"><button class="abtn del" onclick="delDep(${d.id})">O'chirish</button></div></td>
+    </tr>`;}).join('');
+  const cnt=document.getElementById('dep-cnt');
+  if(cnt) cnt.textContent=`(${S.departments.length})`;
+}
+function delDep(id){S.departments=S.departments.filter(x=>x.id!==id);renderAll();showNotif('Kafedra o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  GROUPS
+// ═══════════════════════════════════════════════════════
+function addGroup(){
+  const name=document.getElementById('g-name').value.trim();
+  if(!name){showNotif('Guruh nomini kiriting!',1);return;}
+  S.groups.push({id:uid(),name,
+    facId:+document.getElementById('g-fac').value||null,
+    depId:+document.getElementById('g-dep').value||null,
+    dir:document.getElementById('g-dir').value,
+    year:document.getElementById('g-year').value,
+    form:document.getElementById('g-form').value,
+    count:+document.getElementById('g-count').value||20,
+    lead:document.getElementById('g-lead').value
+  });
+  renderAll();showNotif('Guruh qo\'shildi ✓');
+}
+function fillGrpDep(){
+  const facId=document.getElementById('g-fac').value;
+  const sel=document.getElementById('g-dep');
+  sel.innerHTML='<option value="">Tanlang</option>'+
+    S.departments.filter(d=>!facId||d.facId===+facId)
+    .map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+}
+function renderGroups(){
+  const ff=document.getElementById('gf-fac')?.value;
+  const fd=document.getElementById('gf-dep')?.value;
+  const fy=document.getElementById('gf-year')?.value;
+  const tb=document.getElementById('grp-tbody');
+  if(!tb) return;
+  const filtered=S.groups.filter(g=>{
+    if(ff&&g.facId!==+ff) return false;
+    if(fd&&g.depId!==+fd) return false;
+    if(fy&&g.year!==fy) return false;
+    return true;
+  });
+  tb.innerHTML=filtered.map(g=>{
+    const fac=byId(S.faculties,g.facId);
+    const dep=byId(S.departments,g.depId);
+    return`<tr>
+      <td>${tagHtml(g.name,'tag-b')}</td>
+      <td>${fac?tagHtml(fac.code,'tag-g'):'—'}</td>
+      <td>${dep?dep.name:'—'}</td>
+      <td>${g.dir}</td><td>${g.year}</td>
+      <td>${tagHtml(g.form,g.form==='Kunduzgi'?'tag-g':g.form==='Sirtqi'?'tag-o':'tag-p')}</td>
+      <td style="text-align:center">${g.count}</td>
+      <td><div class="acts"><button class="abtn del" onclick="delGroup(${g.id})">O'chirish</button></div></td>
+    </tr>`;}).join('');
+  const cnt=document.getElementById('grp-cnt');
+  if(cnt) cnt.textContent=`(${filtered.length}/${S.groups.length})`;
+}
+function delGroup(id){S.groups=S.groups.filter(x=>x.id!==id);S.lessons=S.lessons.filter(l=>l.groupId!==id);renderAll();showNotif('Guruh o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  TEACHERS
+// ═══════════════════════════════════════════════════════
+function addTeacher(){
+  const name=document.getElementById('t-name').value.trim();
+  if(!name){showNotif('F.I.O kiriting!',1);return;}
+  S.teachers.push({id:uid(),name,
+    depId:+document.getElementById('t-dep').value||null,
+    rank:document.getElementById('t-rank').value,
+    degree:document.getElementById('t-degree').value,
+    phone:document.getElementById('t-phone').value,
+    email:document.getElementById('t-email').value,
+    maxH:+document.getElementById('t-maxh').value||18,
+    busy:document.getElementById('t-busy').value
+  });
+  renderAll();showNotif("O'qituvchi qo'shildi ✓");
+}
+function teacherLoad(id){return S.lessons.filter(l=>l.teacherId===+id).length*1.5;}
+function renderTeachers(){
+  const fd=document.getElementById('tf-dep')?.value;
+  const fr=document.getElementById('tf-rank')?.value;
+  const tb=document.getElementById('tea-tbody');
+  if(!tb) return;
+  const filtered=S.teachers.filter(t=>{
+    if(fd&&t.depId!==+fd) return false;
+    if(fr&&t.rank!==fr) return false;
+    return true;
+  });
+  tb.innerHTML=filtered.map(t=>{
+    const dep=byId(S.departments,t.depId);
+    const load=teacherLoad(t.id);
+    const pct=Math.round(load/t.maxH*100);
+    const over=pct>100;
+    return`<tr>
+      <td><strong>${t.name}</strong></td>
+      <td>${dep?dep.name:'—'}</td>
+      <td>${tagHtml(t.rank,t.rank==='Professor'?'tag-o':t.rank==='Dotsent'?'tag-b':'tag-p')}</td>
+      <td>${tagHtml(t.degree,'tag-c')}</td>
+      <td style="font-family:var(--fm);font-size:.75rem">${t.phone}</td>
+      <td style="text-align:center">${t.maxH}</td>
+      <td style="text-align:center;color:${loadColor(pct)}">${load.toFixed(1)}</td>
+      <td><div style="min-width:80px"><div class="load-bar-bg"><div class="load-bar" style="width:${Math.min(pct,100)}%;background:${loadColor(pct)}"></div></div><div style="font-family:var(--fm);font-size:.6rem;color:${loadColor(pct)}">${pct}%</div></div></td>
+      <td><div class="acts"><button class="abtn del" onclick="delTeacher(${t.id})">O'chirish</button></div></td>
+    </tr>`;}).join('');
+  const cnt=document.getElementById('tea-cnt');
+  if(cnt) cnt.textContent=`(${filtered.length}/${S.teachers.length})`;
+}
+function delTeacher(id){S.teachers=S.teachers.filter(x=>x.id!==id);S.lessons=S.lessons.filter(l=>l.teacherId!==id);renderAll();showNotif("O'qituvchi o'chirildi");}
+
+// ═══════════════════════════════════════════════════════
+//  SUBJECTS
+// ═══════════════════════════════════════════════════════
+function addSubject(){
+  const name=document.getElementById('sub-name').value.trim();
+  const code=document.getElementById('sub-code').value.trim();
+  if(!name||!code){showNotif('Fan nomi va kodini kiriting!',1);return;}
+  S.subjects.push({id:uid(),name,code,
+    depId:+document.getElementById('sub-dep').value||null,
+    type:document.getElementById('sub-type').value,
+    credit:+document.getElementById('sub-credit').value||3,
+    lec:+document.getElementById('sub-lec').value||0,
+    prac:+document.getElementById('sub-prac').value||0,
+    lab:+document.getElementById('sub-lab').value||0
+  });
+  renderAll();showNotif('Fan qo\'shildi ✓');
+}
+function renderSubjects(){
+  const fd=document.getElementById('sf-dep')?.value;
+  const ft=document.getElementById('sf-type')?.value;
+  const tb=document.getElementById('sub-tbody');
+  if(!tb) return;
+  const filtered=S.subjects.filter(s=>{
+    if(fd&&s.depId!==+fd) return false;
+    if(ft&&s.type!==ft) return false;
+    return true;
+  });
+  tb.innerHTML=filtered.map(s=>{
+    const dep=byId(S.departments,s.depId);
+    return`<tr>
+      <td>${tagHtml(s.code,'tag-b')}</td><td><strong>${s.name}</strong></td>
+      <td>${dep?dep.name:'—'}</td>
+      <td>${tagHtml(s.type,s.type==='Majburiy'?'tag-r':s.type==='Ixtisoslik'?'tag-p':'tag-g')}</td>
+      <td style="text-align:center">${s.credit}</td>
+      <td style="text-align:center">${s.lec}</td>
+      <td style="text-align:center">${s.prac}</td>
+      <td style="text-align:center">${s.lab}</td>
+      <td><div class="acts"><button class="abtn del" onclick="delSubject(${s.id})">O'chirish</button></div></td>
+    </tr>`;}).join('');
+  const cnt=document.getElementById('sub-cnt');
+  if(cnt) cnt.textContent=`(${filtered.length}/${S.subjects.length})`;
+}
+function delSubject(id){S.subjects=S.subjects.filter(x=>x.id!==id);S.lessons=S.lessons.filter(l=>l.subjectId!==id);renderAll();showNotif('Fan o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  ROOMS
+// ═══════════════════════════════════════════════════════
+function addRoom(){
+  const num=document.getElementById('r-num').value.trim();
+  if(!num){showNotif('Xona raqamini kiriting!',1);return;}
+  S.rooms.push({id:uid(),num,
+    buildingId:+document.getElementById('r-bld').value||null,
+    type:document.getElementById('r-type').value,
+    cap:+document.getElementById('r-cap').value||30,
+    equip:document.getElementById('r-equip').value,
+    depId:+document.getElementById('r-dep').value||null
+  });
+  renderAll();showNotif('Xona qo\'shildi ✓');
+}
+function roomUtil(id){
+  const total=5*PAIRS.length;
+  const used=S.lessons.filter(l=>l.roomId===+id).length;
+  return Math.min(100,Math.round(used/total*100));
+}
+function renderRooms(){
+  const tb=document.getElementById('room-tbody');
+  const ug=document.getElementById('room-util-grid');
+  if(tb){
+    tb.innerHTML=S.rooms.map(r=>{
+      const b=byId(S.buildings,r.buildingId);
+      const u=roomUtil(r.id);
+      return`<tr>
+        <td>${tagHtml(r.num,'tag-b')}</td>
+        <td>${b?b.code:'—'}</td>
+        <td>${tagHtml(r.type,r.type==='Laboratoriya'?'tag-g':r.type.includes('Kompyuter')?'tag-c':'tag-p')}</td>
+        <td style="text-align:center">${r.cap}</td>
+        <td style="font-size:.75rem">${r.equip}</td>
+        <td><div style="min-width:80px"><div class="load-bar-bg"><div class="load-bar" style="width:${u}%;background:${loadColor(u)}"></div></div><div style="font-family:var(--fm);font-size:.6rem;color:${loadColor(u)}">${u}%</div></div></td>
+        <td><div class="acts"><button class="abtn del" onclick="delRoom(${r.id})">O'chirish</button></div></td>
+      </tr>`;}).join('');
+    const cnt=document.getElementById('room-cnt');
+    if(cnt) cnt.textContent=`(${S.rooms.length})`;
+  }
+  if(ug){
+    ug.innerHTML=S.rooms.map(r=>{
+      const u=roomUtil(r.id);
+      return`<div class="util-card">
+        <div class="uc-name">${r.num}</div>
+        <div class="uc-type">${r.type} · ${r.cap} kishi</div>
+        <div class="uc-bar-bg"><div class="uc-bar" style="width:${u}%;background:${loadColor(u)}"></div></div>
+        <div class="uc-pct">${u}% band</div>
+      </div>`;}).join('');
+  }
+}
+function delRoom(id){S.rooms=S.rooms.filter(x=>x.id!==id);S.lessons=S.lessons.filter(l=>l.roomId!==id);renderAll();showNotif('Xona o\'chirildi');}
+
+// ═══════════════════════════════════════════════════════
+//  LESSONS (MODAL)
+// ═══════════════════════════════════════════════════════
+function fillModalSelects(){
+  const mf=document.getElementById('ml-fac');
+  mf.innerHTML='<option value="">Tanlang</option>'+S.faculties.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+  document.getElementById('ml-dep').innerHTML='<option value="">Tanlang</option>'+S.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  document.getElementById('ml-group').innerHTML='<option value="">Tanlang</option>'+S.groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('ml-sub').innerHTML='<option value="">Tanlang</option>'+S.subjects.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('ml-tea').innerHTML='<option value="">Tanlang</option>'+S.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  document.getElementById('ml-room').innerHTML='<option value="">Tanlang</option>'+S.rooms.map(r=>`<option value="${r.id}">${r.num} (${r.type}, ${r.cap} kishi)</option>`).join('');
+}
+function mlFilterDep(){
+  const facId=document.getElementById('ml-fac').value;
+  document.getElementById('ml-dep').innerHTML='<option value="">Tanlang</option>'+
+    S.departments.filter(d=>!facId||d.facId===+facId)
+    .map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  mlFilterGroup();
+}
+function mlFilterGroup(){
+  const depId=document.getElementById('ml-dep').value;
+  document.getElementById('ml-group').innerHTML='<option value="">Tanlang</option>'+
+    S.groups.filter(g=>!depId||g.depId===+depId)
+    .map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+}
+
+function openLessonModal(){
+  S.editingLesson=null;
+  fillModalSelects();
+  document.getElementById('modal-lesson-title').textContent='📅 Dars qo\'shish';
+  document.getElementById('modal-del-btn').style.display='none';
+  document.getElementById('modal-conflict-warn').style.display='none';
+  document.getElementById('lesson-modal').classList.add('open');
+}
+function editLesson(id){
+  const l=S.lessons.find(x=>x.id===id);
+  if(!l) return;
+  S.editingLesson=id;
+  fillModalSelects();
+  document.getElementById('ml-fac').value=byId(S.groups,l.groupId)?.facId||'';
+  mlFilterDep();
+  document.getElementById('ml-dep').value=byId(S.groups,l.groupId)?.depId||'';
+  mlFilterGroup();
+  document.getElementById('ml-group').value=l.groupId;
+  document.getElementById('ml-sub').value=l.subjectId;
+  document.getElementById('ml-tea').value=l.teacherId;
+  document.getElementById('ml-room').value=l.roomId;
+  document.getElementById('ml-day').value=l.day;
+  document.getElementById('ml-pair').value=l.pair;
+  document.getElementById('ml-type').value=l.type;
+  document.getElementById('ml-week').value=l.week;
+  document.getElementById('modal-lesson-title').textContent='✏️ Darsni tahrirlash';
+  document.getElementById('modal-del-btn').style.display='';
+  document.getElementById('modal-conflict-warn').style.display='none';
+  document.getElementById('lesson-modal').classList.add('open');
+}
+function saveLesson(){
+  const lesson={
+    groupId:+document.getElementById('ml-group').value,
+    subjectId:+document.getElementById('ml-sub').value,
+    teacherId:+document.getElementById('ml-tea').value,
+    roomId:+document.getElementById('ml-room').value,
+    day:+document.getElementById('ml-day').value,
+    pair:+document.getElementById('ml-pair').value,
+    type:document.getElementById('ml-type').value,
+    week:document.getElementById('ml-week').value
+  };
+  if(!lesson.groupId||!lesson.subjectId||!lesson.teacherId||!lesson.roomId){
+    showNotif('Barcha maydonlarni to\'ldiring!',1);return;
+  }
+  if(S.editingLesson){
+    const idx=S.lessons.findIndex(l=>l.id===S.editingLesson);
+    S.lessons[idx]={...S.lessons[idx],...lesson};
+  } else {
+    S.lessons.push({id:uid(),...lesson});
+  }
+  closeModal();renderAll();
+  showNotif(S.editingLesson?'Dars yangilandi ✓':'Dars qo\'shildi ✓');
+}
+function deleteLesson(){
+  S.lessons=S.lessons.filter(l=>l.id!==S.editingLesson);
+  closeModal();renderAll();showNotif('Dars o\'chirildi');
+}
+function closeModal(){document.getElementById('lesson-modal').classList.remove('open');}
+
+// ═══════════════════════════════════════════════════════
+//  AUTO-SCHEDULE
+// ═══════════════════════════════════════════════════════
+function autoSchedule(){
+  // Simple greedy auto-scheduler: for each group+subject combo, find free slot
+  let placed=0;
+  S.groups.forEach(g=>{
+    S.subjects.forEach(s=>{
+      // place lec sessions
+      if(s.lec>0 && !S.lessons.find(l=>l.groupId===g.id&&l.subjectId===s.id&&l.type==='lec')){
+        const tea=S.teachers.find(t=>t.depId===s.depId);
+        if(!tea) return;
+        for(let d=0;d<5;d++){
+          for(let p=0;p<PAIRS.length;p++){
+            const tBusy=S.lessons.some(l=>l.teacherId===tea.id&&l.day===d&&l.pair===p);
+            const gBusy=S.lessons.some(l=>l.groupId===g.id&&l.day===d&&l.pair===p);
+            const rm=S.rooms.find(r=>r.type!=='Laboratoriya'&&r.cap>=g.count&&
+              !S.lessons.some(l=>l.roomId===r.id&&l.day===d&&l.pair===p));
+            if(!tBusy&&!gBusy&&rm){
+              S.lessons.push({id:uid(),groupId:g.id,subjectId:s.id,teacherId:tea.id,roomId:rm.id,day:d,pair:p,type:'lec',week:'all'});
+              placed++;break;
+            }
+          }
+          if(S.lessons.find(l=>l.groupId===g.id&&l.subjectId===s.id&&l.type==='lec')) break;
+        }
+      }
+    });
+  });
+  renderAll();
+  showNotif(`🤖 Avto-jadval: ${placed} ta dars joylashtirildi ✓`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ANALYTICS
+// ═══════════════════════════════════════════════════════
+function renderAnalytics(){
+  document.getElementById('an-les').textContent=S.lessons.length;
+  document.getElementById('an-cf').textContent=detectConflicts().length;
+  const totalSt=S.groups.reduce((a,g)=>a+g.count,0);
+  document.getElementById('an-st').textContent=totalSt;
+  const avgRU=S.rooms.length?Math.round(S.rooms.reduce((a,r)=>a+roomUtil(r.id),0)/S.rooms.length):0;
+  document.getElementById('an-ru').textContent=avgRU+'%';
+  const avgTL=S.teachers.length?Math.round(S.teachers.reduce((a,t)=>a+Math.round(teacherLoad(t.id)/t.maxH*100),0)/S.teachers.length):0;
+  document.getElementById('an-tl').textContent=avgTL+'%';
+
+  const ttb=document.getElementById('an-tea-tbody');
+  if(ttb) ttb.innerHTML=S.teachers.map(t=>{
+    const dep=byId(S.departments,t.depId);
+    const load=teacherLoad(t.id);
+    const pct=Math.round(load/t.maxH*100);
+    const status=pct>100?tagHtml('⚠ Yuklama oshgan','tag-r'):pct>80?tagHtml('Yuqori','tag-o'):tagHtml('Normal','tag-g');
+    return`<tr><td>${t.name}</td><td>${dep?dep.name:'—'}</td><td>${t.rank}</td>
+      <td style="color:${loadColor(pct)}">${load.toFixed(1)}</td><td>${t.maxH}</td><td>${status}</td></tr>`;}).join('');
+
+  const dtb=document.getElementById('an-dep-tbody');
+  if(dtb) dtb.innerHTML=S.departments.map(d=>{
+    const fac=byId(S.faculties,d.facId);
+    const teas=S.teachers.filter(t=>t.depId===d.id).length;
+    const grps=S.groups.filter(g=>g.depId===d.id).length;
+    const les=S.lessons.filter(l=>byId(S.groups,l.groupId)?.depId===d.id).length;
+    const pct=Math.round(les/(5*PAIRS.length)*100);
+    return`<tr><td>${d.name}</td><td>${fac?tagHtml(fac.code,'tag-b'):'—'}</td>
+      <td>${les}</td><td>${teas}</td><td>${grps}</td>
+      <td><div class="load-bar-bg"><div class="load-bar" style="width:${Math.min(pct,100)}%;background:${loadColor(pct)}"></div></div><div style="font-family:var(--fm);font-size:.6rem;color:${loadColor(pct)}">${pct}%</div></td>
+    </tr>`;}).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════
+function renderExportPage(){
+  document.getElementById('ex-l').textContent=S.lessons.length;
+  document.getElementById('ex-g').textContent=S.groups.length;
+  document.getElementById('ex-s').textContent=S.subjects.length;
+  document.getElementById('ex-t').textContent=S.teachers.length;
+  document.getElementById('ex-r').textContent=S.rooms.length;
+}
+function exportAll(fmt){
+  if(fmt==='json'){
+    const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+    dl(b,'univerjadval_full.json');
+  } else if(fmt==='csv-lessons'){
+    const rows=[['ID','Guruh','Fan','O\'qituvchi','Xona','Kun','Juft','Turi','Hafta']];
+    S.lessons.forEach(l=>rows.push([l.id,
+      byId(S.groups,l.groupId)?.name||'',
+      byId(S.subjects,l.subjectId)?.name||'',
+      byId(S.teachers,l.teacherId)?.name||'',
+      byId(S.rooms,l.roomId)?.num||'',
+      DAYS[l.day],PAIRS[l.pair],TLBL[l.type],l.week]));
+    dl(new Blob([rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n')],{type:'text/csv'}),'darslar.csv');
+  } else if(fmt==='csv-teachers'){
+    const rows=[["F.I.O","Kafedra","Lavozim","Telefon","Max soat","Band soat"]];
+    S.teachers.forEach(t=>rows.push([t.name,byId(S.departments,t.depId)?.name||'',t.rank,t.phone,t.maxH,teacherLoad(t.id).toFixed(1)]));
+    dl(new Blob([rows.map(r=>r.map(x=>`"${x}"`).join(',')).join('\n')],{type:'text/csv'}),'oqituvchilar.csv');
+  }
+  showNotif('Fayl yuklab olindi ✓');
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+function exportFaculty(){showNotif('Fakultet jadvali JSON sifatida saqlanmoqda...');exportAll('json');}
+function exportGroup(){showNotif('Guruh jadvali CSV sifatida saqlanmoqda...');exportAll('csv-lessons');}
+
+// ═══════════════════════════════════════════════════════
+//  FILL SELECTS GLOBALLY
+// ═══════════════════════════════════════════════════════
+function fillGlobalSelects(){
+  const facOpts='<option value="">Tanlang</option>'+S.faculties.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+  const depOpts='<option value="">Tanlang</option>'+S.departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  const bldOpts='<option value="">Tanlang</option>'+S.buildings.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  const grpOpts='<option value="">Tanlang</option>'+S.groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+
+  ['dep-fac','g-fac','f-faculty','gf-fac','cf-fac','ef-fac'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML=facOpts;});
+  ['t-dep','sub-dep','r-dep','sf-dep','tf-dep'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML=depOpts;});
+  ['dep-building','r-bld'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML=bldOpts;});
+  ['eg-group','f-group'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML=grpOpts;});
+  ['f-teacher'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML='<option value="">— O\'qituvchi —</option>'+S.teachers.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');});
+  ['f-room'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML='<option value="">— Xona —</option>'+S.rooms.map(r=>`<option value="${r.id}">${r.num}</option>`).join('');});
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD QUICK LIST
+// ═══════════════════════════════════════════════════════
+function renderQuickList(){
+  const el=document.getElementById('quick-list');
+  if(!el) return;
+  const totalSt=S.groups.reduce((a,g)=>a+g.count,0);
+  const conflicts=detectConflicts().length;
+  const overloaded=S.teachers.filter(t=>teacherLoad(t.id)>t.maxH).length;
+  const items=[
+    {dot:'var(--a3)',text:`Jami talabalar: <strong>${totalSt}</strong> nafar`},
+    {dot:'var(--a1)',text:`Binolar: <strong>${S.buildings.length}</strong> ta`},
+    {dot:'var(--a2)',text:`Xonalar: <strong>${S.rooms.length}</strong> ta (${Math.round(S.rooms.reduce((a,r)=>a+roomUtil(r.id),0)/Math.max(S.rooms.length,1))}% band)`},
+    {dot:conflicts?'var(--a4)':'var(--a3)',text:`Konfliktlar: <strong>${conflicts}</strong>`},
+    {dot:overloaded?'var(--a4)':'var(--a3)',text:`Yuklamasi oshgan o'qituvchilar: <strong>${overloaded}</strong>`},
+    {dot:'var(--a5)',text:`Ta'lim shakllari: Kunduzgi, Sirtqi, Kechki`},
+  ];
+  el.innerHTML=items.map(i=>`<div class="ql-item"><div class="ql-dot" style="background:${i.dot}"></div><div>${i.text}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PAGE NAV / TABS
+// ═══════════════════════════════════════════════════════
+const PAGE_TITLES={
+  dashboard:'Bosh sahifa',schedule:'Dars jadvali',conflicts:'Konfliktlar',
+  faculties:'Fakultetlar',departments:'Kafedralar',groups:'Guruhlar',
+  teachers:"O'qituvchilar",subjects:'Fanlar',rooms:'Xonalar',buildings:'Binolar',
+  analytics:'Tahlil va statistika',export:'Eksport'
+};
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const onclick=n.getAttribute('onclick')||'';
+    n.classList.toggle('active',onclick.includes(`'${name}'`));
+  });
+  document.getElementById('topbar-title').textContent=PAGE_TITLES[name]||name;
+}
+function switchItab(btn,contentId){
+  btn.closest('.inner-tabs').querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.page').querySelectorAll('.itab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(contentId).classList.add('active');
+}
+function clearForm(prefix){
+  document.querySelectorAll(`[id^="${prefix}-"]`).forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value='';
+  });
+}
+function changeUniversity(){
+  const names={ttu:'Toshkent Texnika Universiteti',nuu:'Milliy Universitet',tmu:'Toshkent Tibbiyot Akademiyasi',tdpu:'TDPU'};
+  showNotif('Universitet o\'zgartirildi: '+names[document.getElementById('uni-select').value]+'  (Demo ma\'lumotlar qolmoqda)');
+}
+
+// ═══════════════════════════════════════════════════════
+//  COUNTERS
+// ═══════════════════════════════════════════════════════
+function updateCounters(){
+  document.getElementById('s-fac').textContent=S.faculties.length;
+  document.getElementById('s-dep').textContent=S.departments.length;
+  document.getElementById('s-grp').textContent=S.groups.length;
+  document.getElementById('s-tea').textContent=S.teachers.length;
+  document.getElementById('s-les').textContent=S.lessons.length;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════
+function renderAll(){
+  fillGlobalSelects();
+  updateCounters();
+  renderConflictBadge();
+  renderConflictPage();
+  renderDashSch();
+  renderSch();
+  renderQuickList();
+  renderBuildings();
+  renderFaculties();
+  renderDepartments();
+  renderGroups();
+  renderTeachers();
+  renderSubjects();
+  renderRooms();
+  renderAnalytics();
+  renderExportPage();
+}
+
+// INIT
+seed();
+renderAll();
+</script>
+</body>
+</html>
