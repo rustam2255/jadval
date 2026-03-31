@@ -299,6 +299,7 @@ body::before{content:'';position:fixed;inset:0;
     <span class="chip ok" id="chip-ok">✓ Tizim normal</span>
     <span class="chip" id="chip-sem">2-semestr • 2024-25</span>
     <span class="chip" id="chip-week">Hafta: Toq</span>
+    <span class="chip" id="chip-save">Saqlash: tayyor</span>
   </div>
 </header>
 
@@ -719,9 +720,18 @@ const S = {
   teachers:[],subjects:[],rooms:[],lessons:[],
   editingLesson:null
 };
-const STORAGE_KEY='unijadval-pro-state-v1';
+const STORAGE_KEY='unijadval-pro-state-v2';
+const SNAPSHOT_KEY='unijadval-pro-snapshots-v2';
+const META_KEY='unijadval-pro-meta-v2';
+const IDB_NAME='UniJadvalProDB';
+const IDB_STORE='state_backups';
+const MAX_SNAPSHOTS=20;
 let _uid=500;
 let _renderScheduled=false;
+let _saveTimer=null;
+let _isApplyingExternalState=false;
+let _lastSnapshotHash='';
+let _lastSnapshotAt=0;
 const uid=()=>++_uid;
 
 const DAYS=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma'];
@@ -738,6 +748,34 @@ function getPersistableState(){
     lessons:S.lessons
   };
 }
+function stableStringify(obj){
+  return JSON.stringify(obj);
+}
+function getMeta(){
+  try{
+    return JSON.parse(localStorage.getItem(META_KEY)||'{}')||{};
+  }catch(_){
+    return {};
+  }
+}
+function setMeta(patch={}){
+  const next={...getMeta(),...patch,updatedAt:new Date().toISOString()};
+  try{localStorage.setItem(META_KEY,JSON.stringify(next));}catch(_){}
+  updateSaveChip(next);
+  return next;
+}
+function updateSaveChip(meta=getMeta()){
+  const el=document.getElementById('chip-save');
+  if(!el) return;
+  if(!meta.lastSavedAt){
+    el.textContent='Saqlash: demo';
+    return;
+  }
+  const dt=new Date(meta.lastSavedAt);
+  const hh=String(dt.getHours()).padStart(2,'0');
+  const mm=String(dt.getMinutes()).padStart(2,'0');
+  el.textContent=`Saqlash: ${hh}:${mm}`;
+}
 function syncUid(){
   const allIds=[
     ...S.buildings.map(x=>x.id||0),
@@ -751,35 +789,209 @@ function syncUid(){
   ];
   _uid=Math.max(500,...allIds);
 }
-function saveState(){
+function applyState(parsed){
+  ['buildings','faculties','departments','groups','teachers','subjects','rooms','lessons'].forEach(key=>{
+    S[key]=Array.isArray(parsed[key])?parsed[key]:[];
+  });
+  S.editingLesson=null;
+  syncUid();
+}
+function getSnapshots(){
   try{
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(getPersistableState()));
+    const parsed=JSON.parse(localStorage.getItem(SNAPSHOT_KEY)||'[]');
+    return Array.isArray(parsed)?parsed:[];
+  }catch(_){
+    return [];
+  }
+}
+function setSnapshots(list){
+  try{
+    localStorage.setItem(SNAPSHOT_KEY,JSON.stringify(list.slice(0,MAX_SNAPSHOTS)));
+  }catch(err){
+    console.warn('Snapshot saqlashda xatolik:',err);
+  }
+}
+function createSnapshot(reason='auto'){
+  try{
+    const state=getPersistableState();
+    const json=stableStringify(state);
+    const now=Date.now();
+    if(reason==='auto' && json===_lastSnapshotHash && (now-_lastSnapshotAt)<10000) return;
+    const list=getSnapshots();
+    list.unshift({
+      id: now,
+      reason,
+      createdAt: new Date(now).toISOString(),
+      state
+    });
+    _lastSnapshotHash=json;
+    _lastSnapshotAt=now;
+    setSnapshots(list);
+    writeIndexedBackup(reason,state);
+    setMeta({lastSnapshotAt:new Date(now).toISOString(),lastAction:reason});
+  }catch(err){
+    console.warn('Snapshot yaratishda xatolik:',err);
+  }
+}
+function saveState(reason='auto'){
+  try{
+    const state=getPersistableState();
+    localStorage.setItem(STORAGE_KEY,stableStringify(state));
+    setMeta({lastSavedAt:new Date().toISOString(),lastAction:reason,version:'v2'});
+    if(_saveTimer) clearTimeout(_saveTimer);
+    _saveTimer=setTimeout(()=>createSnapshot(reason), reason==='auto' ? 1200 : 0);
   }catch(err){
     console.warn('LocalStorage saqlashda xatolik:',err);
+    showNotif('Saqlashda muammo yuz berdi',1);
   }
 }
 function loadState(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw) return false;
-    const parsed=JSON.parse(raw);
-    ['buildings','faculties','departments','groups','teachers','subjects','rooms','lessons'].forEach(key=>{
-      S[key]=Array.isArray(parsed[key])?parsed[key]:[];
-    });
-    S.editingLesson=null;
-    syncUid();
-    return true;
+    if(raw){
+      applyState(JSON.parse(raw));
+      return true;
+    }
   }catch(err){
-    console.warn('LocalStorage o‘qishda xatolik:',err);
+    console.warn('Asosiy saqlash o‘qishda xatolik:',err);
+  }
+  try{
+    const latest=getSnapshots()[0];
+    if(latest?.state){
+      applyState(latest.state);
+      saveState('snapshot-recovery');
+      return true;
+    }
+  }catch(err){
+    console.warn('Snapshotdan tiklashda xatolik:',err);
+  }
+  return false;
+}
+function resetState(){
+  [STORAGE_KEY,SNAPSHOT_KEY,META_KEY].forEach(k=>localStorage.removeItem(k));
+  clearIndexedBackups();
+  seed();
+  syncUid();
+  renderAll('reset');
+  showNotif('Ma’lumotlar standart holatga qaytarildi ✓');
+}
+function restoreLatestSnapshot(){
+  const latest=getSnapshots()[0];
+  if(!latest?.state){
+    showNotif('Tiklash uchun snapshot topilmadi',1);
+    return;
+  }
+  applyState(latest.state);
+  renderAll('snapshot-restore');
+  showNotif('Oxirgi snapshot tiklandi ✓');
+}
+function downloadBackup(){
+  const payload={
+    exportedAt:new Date().toISOString(),
+    app:'UniJadval Pro Super',
+    version:'v2',
+    state:getPersistableState(),
+    snapshots:getSnapshots().slice(0,5)
+  };
+  dl(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`unijadval_backup_${Date.now()}.json`);
+  showNotif('Backup yuklandi ✓');
+}
+function importBackup(event){
+  const file=event?.target?.files?.[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const next=parsed?.state||parsed;
+      if(!next || typeof next!=='object') throw new Error('Noto‘g‘ri backup format');
+      applyState(next);
+      renderAll('import');
+      createSnapshot('import');
+      showNotif('Backup import qilindi ✓');
+    }catch(err){
+      console.warn(err);
+      showNotif('Backup faylni o‘qib bo‘lmadi',1);
+    }finally{
+      event.target.value='';
+    }
+  };
+  reader.readAsText(file,'utf-8');
+}
+async function openDb(){
+  return await new Promise((resolve,reject)=>{
+    const req=indexedDB.open(IDB_NAME,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(IDB_STORE)){
+        db.createObjectStore(IDB_STORE,{keyPath:'id'});
+      }
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function writeIndexedBackup(reason,state=getPersistableState()){
+  if(!('indexedDB' in window)) return;
+  try{
+    const db=await openDb();
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).put({id:Date.now(),reason,createdAt:new Date().toISOString(),state});
+  }catch(err){
+    console.warn('IndexedDB backup xatoligi:',err);
+  }
+}
+async function clearIndexedBackups(){
+  if(!('indexedDB' in window)) return;
+  try{
+    const db=await openDb();
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).clear();
+  }catch(err){
+    console.warn('IndexedDB tozalash xatoligi:',err);
+  }
+}
+async function recoverFromIndexedDb(){
+  if(!('indexedDB' in window)) return false;
+  try{
+    const db=await openDb();
+    const tx=db.transaction(IDB_STORE,'readonly');
+    const req=tx.objectStore(IDB_STORE).getAll();
+    return await new Promise((resolve)=>{
+      req.onsuccess=()=>{
+        const rows=(req.result||[]).sort((a,b)=>b.id-a.id);
+        const latest=rows[0];
+        if(latest?.state){
+          applyState(latest.state);
+          renderAll('idb-recovery');
+          showNotif('IndexedDB backupdan tiklandi ✓');
+          resolve(true);
+          return;
+        }
+        resolve(false);
+      };
+      req.onerror=()=>resolve(false);
+    });
+  }catch(err){
+    console.warn('IndexedDB tiklash xatoligi:',err);
     return false;
   }
 }
-function resetState(){
-  localStorage.removeItem(STORAGE_KEY);
-  seed();
-  syncUid();
-  renderAll();
-  showNotif('Ma’lumotlar standart holatga qaytarildi ✓');
+function setupStorageSync(){
+  window.addEventListener('storage',(e)=>{
+    if(e.key!==STORAGE_KEY || !e.newValue || _isApplyingExternalState) return;
+    try{
+      _isApplyingExternalState=true;
+      applyState(JSON.parse(e.newValue));
+      renderAll('storage-sync');
+      showNotif('Boshqa tabdagi o‘zgarishlar yangilandi ✓');
+    }catch(err){
+      console.warn('Storage sync xatoligi:',err);
+    }finally{
+      _isApplyingExternalState=false;
+    }
+  });
+  window.addEventListener('beforeunload',()=>saveState('beforeunload'));
 }
 const PAIRS=['08:00–09:30','09:45–11:15','11:30–13:00','13:45–15:15','15:30–17:00','17:15–18:45'];
 const TCSS={lec:'t-lec',prac:'t-prac',lab:'t-lab',sem:'t-sem',kurs:'t-kurs'};
@@ -1584,12 +1796,13 @@ function updateCounters(){
 // ═══════════════════════════════════════════════════════
 //  RENDER ALL
 // ═══════════════════════════════════════════════════════
-function renderAll(){
+function renderAll(reason='auto'){
   if(_renderScheduled) return;
   _renderScheduled=true;
   requestAnimationFrame(()=>{
     _renderScheduled=false;
     fillGlobalSelects();
+    updateSaveChip();
     updateCounters();
     renderConflictBadge();
     renderConflictPage();
@@ -1605,14 +1818,25 @@ function renderAll(){
     renderRooms();
     renderAnalytics();
     renderExportPage();
-    saveState();
+    saveState(reason);
   });
 }
 
 // INIT
-if(!loadState()) seed();
-syncUid();
-renderAll();
+async function initApp(){
+  let loaded=loadState();
+  if(!loaded){
+    loaded=await recoverFromIndexedDb();
+  }
+  if(!loaded){
+    seed();
+  }
+  syncUid();
+  setupStorageSync();
+  renderAll(loaded?'init':'seed');
+  updateSaveChip();
+}
+initApp();
 </script>
 </body>
 </html>
