@@ -629,6 +629,7 @@ body::before{content:'';position:fixed;inset:0;
         <button class="btn btn-g" onclick="exportAll('csv-lessons')">⬇ CSV (darslar)</button>
         <button class="btn btn-o" onclick="exportAll('csv-teachers')">⬇ CSV (o'qituvchilar)</button>
         <button class="btn btn-s" onclick="window.print()">🖨 Chop etish</button>
+        <button class="btn btn-r" onclick="resetState()">↺ Reset</button>
       </div>
     </div>
     <div class="stats-row">
@@ -718,10 +719,68 @@ const S = {
   teachers:[],subjects:[],rooms:[],lessons:[],
   editingLesson:null
 };
+const STORAGE_KEY='unijadval-pro-state-v1';
 let _uid=500;
+let _renderScheduled=false;
 const uid=()=>++_uid;
 
 const DAYS=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma'];
+
+function getPersistableState(){
+  return {
+    buildings:S.buildings,
+    faculties:S.faculties,
+    departments:S.departments,
+    groups:S.groups,
+    teachers:S.teachers,
+    subjects:S.subjects,
+    rooms:S.rooms,
+    lessons:S.lessons
+  };
+}
+function syncUid(){
+  const allIds=[
+    ...S.buildings.map(x=>x.id||0),
+    ...S.faculties.map(x=>x.id||0),
+    ...S.departments.map(x=>x.id||0),
+    ...S.groups.map(x=>x.id||0),
+    ...S.teachers.map(x=>x.id||0),
+    ...S.subjects.map(x=>x.id||0),
+    ...S.rooms.map(x=>x.id||0),
+    ...S.lessons.map(x=>x.id||0)
+  ];
+  _uid=Math.max(500,...allIds);
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(getPersistableState()));
+  }catch(err){
+    console.warn('LocalStorage saqlashda xatolik:',err);
+  }
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const parsed=JSON.parse(raw);
+    ['buildings','faculties','departments','groups','teachers','subjects','rooms','lessons'].forEach(key=>{
+      S[key]=Array.isArray(parsed[key])?parsed[key]:[];
+    });
+    S.editingLesson=null;
+    syncUid();
+    return true;
+  }catch(err){
+    console.warn('LocalStorage o‘qishda xatolik:',err);
+    return false;
+  }
+}
+function resetState(){
+  localStorage.removeItem(STORAGE_KEY);
+  seed();
+  syncUid();
+  renderAll();
+  showNotif('Ma’lumotlar standart holatga qaytarildi ✓');
+}
 const PAIRS=['08:00–09:30','09:45–11:15','11:30–13:00','13:45–15:15','15:30–17:00','17:15–18:45'];
 const TCSS={lec:'t-lec',prac:'t-prac',lab:'t-lab',sem:'t-sem',kurs:'t-kurs'};
 const TLBL={lec:"Ma'ruza",prac:'Amaliy',lab:'Laboratoriya',sem:'Seminar',kurs:'Kurs ishi'};
@@ -1428,7 +1487,14 @@ function exportAll(fmt){
   }
   showNotif('Fayl yuklab olindi ✓');
 }
-function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+function dl(blob,name){
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function exportFaculty(){showNotif('Fakultet jadvali JSON sifatida saqlanmoqda...');exportAll('json');}
 function exportGroup(){showNotif('Guruh jadvali CSV sifatida saqlanmoqda...');exportAll('csv-lessons');}
 
@@ -1496,6 +1562,7 @@ function switchItab(btn,contentId){
 function clearForm(prefix){
   document.querySelectorAll(`[id^="${prefix}-"]`).forEach(el=>{
     if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') el.value='';
+    if(el.tagName==='SELECT') el.selectedIndex=0;
   });
 }
 function changeUniversity(){
@@ -1518,26 +1585,33 @@ function updateCounters(){
 //  RENDER ALL
 // ═══════════════════════════════════════════════════════
 function renderAll(){
-  fillGlobalSelects();
-  updateCounters();
-  renderConflictBadge();
-  renderConflictPage();
-  renderDashSch();
-  renderSch();
-  renderQuickList();
-  renderBuildings();
-  renderFaculties();
-  renderDepartments();
-  renderGroups();
-  renderTeachers();
-  renderSubjects();
-  renderRooms();
-  renderAnalytics();
-  renderExportPage();
+  if(_renderScheduled) return;
+  _renderScheduled=true;
+  requestAnimationFrame(()=>{
+    _renderScheduled=false;
+    fillGlobalSelects();
+    updateCounters();
+    renderConflictBadge();
+    renderConflictPage();
+    renderDashSch();
+    renderSch();
+    renderQuickList();
+    renderBuildings();
+    renderFaculties();
+    renderDepartments();
+    renderGroups();
+    renderTeachers();
+    renderSubjects();
+    renderRooms();
+    renderAnalytics();
+    renderExportPage();
+    saveState();
+  });
 }
 
 // INIT
-seed();
+if(!loadState()) seed();
+syncUid();
 renderAll();
 </script>
 </body>
